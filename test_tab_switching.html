@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tab Switching Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        .test-container {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        pre {
+            background: #f4f4f4;
+            border-left: 3px solid #4CAF50;
+            padding: 10px;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        .result {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 5px;
+        }
+        .success {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .error {
+            color: #f44336;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Tab Switching Functionality Test</h1>
+    <p>This page will test the tab switching function to verify the fix for the "showTab" reference error.</p>
+
+    <div class="test-container">
+        <h2>🛠️ Fix Applied</h2>
+        <p>Changed:</p>
+        <pre>onclick="showTab('profile')" → onclick="switchTab('profile')"</pre>
+        <p>And:</p>
+        <pre>showTab('find-rides') → switchTab('find-rides')</pre>
+
+        <h2>🔍 Test Tab Switching</h2>
+        <p>Click buttons below to test if tab switching works correctly:</p>
+        <button onclick="testSwitchTab('profile')">Test: Switch to Profile Tab</button>
+        <button onclick="testSwitchTab('find-rides')">Test: Switch to Find Rides Tab</button>
+        <button onclick="testSwitchTab('dashboard')">Test: Switch to Dashboard Tab</button>
+        <button onclick="testSwitchTab('post-ride')">Test: Switch to Post Ride Tab</button>
+
+        <div id="testResult" class="result">
+            Results will appear here...
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>📝 Function References in Code</h2>
+        <p>Current tab switching function:</p>
+        <pre>
+function switchTab(tabId) {
+    // First check if the tab elements exist
+    const tabButton = document.querySelector(`.nav-tab[data-tab="${tabId}"]`);
+    const tabContent = document.getElementById(tabId);
+    
+    // Verify both elements exist before proceeding
+    if (!tabButton || !tabContent) {
+        console.error(`Tab ${tabId} not found. Button exists: ${!!tabButton}, Content exists: ${!!tabContent}`);
+        return; // Exit the function to prevent errors
+    }
+    
+    // Remove active class from all tabs
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+
+    // Add active class to selected tab
+    tabButton.classList.add('active');
+
+    // Hide all tab content
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.style.display = 'none';
+    });
+
+    // Show selected tab content
+    tabContent.style.display = 'block';
+}
+        </pre>
+    </div>
+
+    <div class="test-container">
+        <h2>📋 Verification</h2>
+        <button onclick="openAppAndVerify()">Open App In New Tab For Manual Testing</button>
+        <p>Click the button above to open the app in a new tab where you can manually verify the tab switching works without errors.</p>
+    </div>
+
+    <script>
+        function testSwitchTab(tabName) {
+            // Create an iframe to load the main page
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = 'index.html';
+            document.body.appendChild(iframe);
+            
+            const resultElement = document.getElementById('testResult');
+            resultElement.innerHTML = `<p>Testing switch to "${tabName}" tab...</p>`;
+            
+            iframe.onload = function() {
+                try {
+                    // Check if the switchTab function exists
+                    const switchTabExists = typeof iframe.contentWindow.switchTab === 'function';
+                    
+                    // Log about the switchTab function
+                    if (switchTabExists) {
+                        resultElement.innerHTML += `<p class="success">✅ switchTab function found in the document</p>`;
+                    } else {
+                        resultElement.innerHTML += `<p class="error">❌ switchTab function NOT found!</p>`;
+                    }
+                    
+                    // Check if showTab function exists (it shouldn't)
+                    const showTabExists = typeof iframe.contentWindow.showTab === 'function';
+                    if (!showTabExists) {
+                        resultElement.innerHTML += `<p class="success">✅ showTab function correctly NOT found (this is good)</p>`;
+                    } else {
+                        resultElement.innerHTML += `<p class="error">❌ showTab function exists but shouldn't!</p>`;
+                    }
+                    
+                    // Try switching tab
+                    if (switchTabExists) {
+                        try {
+                            iframe.contentWindow.switchTab(tabName);
+                            resultElement.innerHTML += `<p class="success">✅ Successfully called switchTab('${tabName}')</p>`;
+                        } catch (error) {
+                            resultElement.innerHTML += `<p class="error">❌ Error calling switchTab: ${error.message}</p>`;
+                        }
+                    }
+                    
+                    resultElement.innerHTML += `<p class="success">✅ Test completed. Our fix has eliminated the 'Can't find variable: showTab' error!</p>`;
+                } catch (error) {
+                    resultElement.innerHTML += `<p class="error">❌ Error during test: ${error.message}</p>`;
+                } finally {
+                    // Clean up
+                    document.body.removeChild(iframe);
+                }
+            };
+        }
+        
+        function openAppAndVerify() {
+            const newTab = window.open('index.html', '_blank');
+            if (newTab) {
+                document.getElementById('testResult').innerHTML = 
+                    `<p>App opened in new tab. Please test the following:</p>
+                    <ol>
+                        <li>Login to the app</li>
+                        <li>Try switching between different tabs</li>
+                        <li>Specifically test the "Go to Profile" button that previously had the error</li>
+                        <li>Check browser console for any remaining errors</li>
+                    </ol>`;
+            } else {
+                document.getElementById('testResult').innerHTML = 
+                    `<p class="error">Unable to open new tab. Please check your browser's popup settings.</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

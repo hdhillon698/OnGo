@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Admin Dashboard Directly</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { padding: 10px 20px; margin: 10px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Admin Dashboard Test</h1>
+    <button onclick="openAdminDashboard()">Open Admin Dashboard</button>
+    <button onclick="testRidesTab()">Test Rides Tab</button>
+    <button onclick="testVerificationTab()">Test Verification Tab</button>
+    
+    <div id="result" style="margin-top: 20px; padding: 20px; background: #f0f0f0; border-radius: 5px;"></div>
+
+    <script>
+        function openAdminDashboard() {
+            // Navigate to main page with admin dashboard
+            window.open('index.html#admin', '_blank');
+        }
+        
+        function testRidesTab() {
+            // Test if rides-table-body exists
+            const iframe = document.createElement('iframe');
+            iframe.src = 'index.html';
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+            
+            iframe.onload = function() {
+                try {
+                    const ridesTableBody = iframe.contentDocument.getElementById('rides-table-body');
+                    const result = document.getElementById('result');
+                    if (ridesTableBody) {
+                        result.innerHTML = '✅ SUCCESS: rides-table-body element found!';
+                        result.style.background = '#d4edda';
+                        result.style.color = '#155724';
+                    } else {
+                        result.innerHTML = '❌ ERROR: rides-table-body element not found!';
+                        result.style.background = '#f8d7da';
+                        result.style.color = '#721c24';
+                    }
+                } catch (e) {
+                    document.getElementById('result').innerHTML = '❌ ERROR: ' + e.message;
+                }
+                document.body.removeChild(iframe);
+            };
+        }
+        
+        function testVerificationTab() {
+            // Test if license-grid exists
+            const iframe = document.createElement('iframe');
+            iframe.src = 'index.html';
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+            
+            iframe.onload = function() {
+                try {
+                    const licenseGrid = iframe.contentDocument.getElementById('license-grid');
+                    const result = document.getElementById('result');
+                    if (licenseGrid) {
+                        result.innerHTML = '✅ SUCCESS: license-grid element found!';
+                        result.style.background = '#d4edda';
+                        result.style.color = '#155724';
+                    } else {
+                        result.innerHTML = '❌ ERROR: license-grid element not found!';
+                        result.style.background = '#f8d7da';
+                        result.style.color = '#721c24';
+                    }
+                } catch (e) {
+                    document.getElementById('result').innerHTML = '❌ ERROR: ' + e.message;
+                }
+                document.body.removeChild(iframe);
+            };
+        }
+    </script>
+</body>
+</html>

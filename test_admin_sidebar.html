@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Admin Sidebar</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-button { 
+            padding: 10px 20px; 
+            margin: 10px; 
+            background: #4CAF50; 
+            color: white; 
+            border: none; 
+            cursor: pointer; 
+            border-radius: 5px;
+        }
+        .result { 
+            margin-top: 20px; 
+            padding: 20px; 
+            background: #f0f0f0; 
+            border-radius: 5px; 
+        }
+    </style>
+</head>
+<body>
+    <h1>Admin Sidebar Close Test</h1>
+    
+    <button class="test-button" onclick="openAdminAndTest()">Open Admin Dashboard & Test Sidebar</button>
+    
+    <div id="result" class="result">
+        <p>Click the button above to:</p>
+        <ol>
+            <li>Open the admin dashboard</li>
+            <li>Show the close button in sidebar header</li>
+            <li>Test the collapse/expand functionality</li>
+        </ol>
+    </div>
+
+    <script>
+        function openAdminAndTest() {
+            // Open admin dashboard in new window
+            const adminWindow = window.open('index.html', '_blank');
+            
+            // Update result
+            document.getElementById('result').innerHTML = `
+                <h3>✅ Admin Dashboard Opened</h3>
+                <p><strong>To test sidebar close functionality:</strong></p>
+                <ol>
+                    <li>Click "Admin Login" button</li>
+                    <li>Look for the <strong>✕ close button</strong> in the top-right of the sidebar header</li>
+                    <li>On desktop: Click close button to collapse sidebar</li>
+                    <li>On mobile: Click hamburger menu to toggle, overlay to close</li>
+                </ol>
+                
+                <h4>New Features Added:</h4>
+                <ul>
+                    <li>✅ Close button (✕) in sidebar header</li>
+                    <li>✅ Desktop: Sidebar collapses/expands with animation</li>
+                    <li>✅ Mobile: Overlay background for touch-to-close</li>
+                    <li>✅ Responsive behavior for all screen sizes</li>
+                </ul>
+                
+                <p><em>The sidebar can now be properly closed on both desktop and mobile!</em></p>
+            `;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Admin Dashboard</title>
+</head>
+<body>
+    <script>
+        // Simulate opening admin dashboard directly
+        window.location = 'index.html';
+        setTimeout(() => {
+            // Wait for page to load, then trigger admin login
+            if (typeof showAdminDashboard === 'function') {
+                showAdminDashboard();
+                // Test clicking on rides tab
+                setTimeout(() => {
+                    if (typeof showAdminTab === 'function') {
+                        showAdminTab('rides');
+                    }
+                }, 500);
+            }
+        }, 2000);
+    </script>
+</body>
+</html>

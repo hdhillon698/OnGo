@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OnGoPool - Location Tracking Test</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+        }
+        
+        .section-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .test-users {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .user-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .driver-avatar {
+            background: #c53030;
+        }
+        
+        .passenger-avatar {
+            background: #6b46c1;
+        }
+
+        .user-role {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        .role-driver {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .role-passenger {
+            background: #d6bcfa;
+            color: #6b46c1;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin: 0.25rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        .btn-success { background: #48bb78; }
+        .btn-warning { background: #ed8936; }
+        .btn-danger { background: #f56565; }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .location-status {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+
+        .map-container {
+            height: 400px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 2rem 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .locations-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .location-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .location-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .location-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .location-data {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: monospace;
+            margin-bottom: 1rem;
+        }
+
+        .distance-info {
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .console {
+            background: #1a202c;
+            color: #e2e8f0;
+            border-radius: 10px;
+            padding: 1rem;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.85rem;
+            height: 200px;
+            overflow-y: auto;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-map-marker-alt"></i> Location Tracking Test</h1>
+            <p>Test real-time location sharing between driver and passenger</p>
+        </div>
+
+        <div class="section-header">
+            <h2>User Location Controls</h2>
+            <p>Start tracking and simulate movement for each user</p>
+        </div>
+
+        <div class="test-users">
+            <div class="user-card">
+                <div class="user-header">
+                    <div class="user-avatar driver-avatar">D</div>
+                    <div>
+                        <h3>Daniel Driver</h3>
+                        <p>Driver User</p>
+                    </div>
+                    <span class="user-role role-driver">Driver</span>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn" id="driver-start">Start Tracking</button>
+                    <button class="btn btn-warning" id="driver-simulate">Simulate Movement</button>
+                    <button class="btn btn-danger" id="driver-stop">Stop Tracking</button>
+                </div>
+                <div class="location-status" id="driver-status">
+                    <strong>GPS Status:</strong> <span id="driver-gps-status">Inactive</span>
+                </div>
+            </div>
+
+            <div class="user-card">
+                <div class="user-header">
+                    <div class="user-avatar passenger-avatar">P</div>
+                    <div>
+                        <h3>Patty Passenger</h3>
+                        <p>Passenger User</p>
+                    </div>
+                    <span class="user-role role-passenger">Passenger</span>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn" id="passenger-start">Start Tracking</button>
+                    <button class="btn btn-warning" id="passenger-simulate">Simulate Movement</button>
+                    <button class="btn btn-danger" id="passenger-stop">Stop Tracking</button>
+                </div>
+                <div class="location-status" id="passenger-status">
+                    <strong>GPS Status:</strong> <span id="passenger-gps-status">Inactive</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="map-container" id="map">
+            <!-- Map will be rendered here -->
+        </div>
+
+        <div class="locations-panel">
+            <div class="location-card">
+                <h3>
+                    <div class="location-icon driver-avatar">D</div>
+                    Driver Location
+                </h3>
+                <div class="location-data" id="driver-location">
+                    Waiting for location data...
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-success" id="driver-share">Share Location</button>
+                    <button class="btn" id="driver-save">Save to Database</button>
+                </div>
+                <div class="distance-info">
+                    <div><strong>ETA:</strong> <span id="driver-eta">--</span></div>
+                    <div><strong>Distance:</strong> <span id="driver-distance">--</span></div>
+                </div>
+            </div>
+
+            <div class="location-card">
+                <h3>
+                    <div class="location-icon passenger-avatar">P</div>
+                    Passenger Location
+                </h3>
+                <div class="location-data" id="passenger-location">
+                    Waiting for location data...
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-success" id="passenger-share">Share Location</button>
+                    <button class="btn" id="passenger-save">Save to Database</button>
+                </div>
+                <div class="distance-info">
+                    <div><strong>Pickup Time:</strong> <span id="pickup-time">--</span></div>
+                    <div><strong>Status:</strong> <span id="pickup-status">Waiting</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="console" id="console">
+            <!-- Console logs will appear here -->
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Global variables
+        let supabase;
+        let map;
+        let driverMarker;
+        let passengerMarker;
+        let driverPath;
+        let driverLocationInterval;
+        let passengerLocationInterval;
+        
+        // Mock user and ride IDs
+        const userIds = {
+            driver: '00000000-0000-0000-0000-000000000001',
+            passenger: '00000000-0000-0000-0000-000000000002'
+        };
+        const rideId = '00000000-0000-0000-0000-000000000003';
+        
+        // Starting locations (San Francisco area)
+        const locations = {
+            driver: { lat: 37.7749, lng: -122.4194 },
+            passenger: { lat: 37.7850, lng: -122.4100 },
+            destination: { lat: 37.7935, lng: -122.3923 }
+        };
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeMap();
+            initializeSupabase();
+            setupEventListeners();
+            logToConsole('🚀 Location tracking test initialized');
+        });
+        
+        // Initialize Supabase
+        function initializeSupabase() {
+            try {
+                const SUPABASE_URL = 'https://efjwsdxgelbgthcyltjr.supabase.co';
+                const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmandzZHhnZWxiZ3RoY3lsdGpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3OTUwODksImV4cCI6MjA2NjM3MTA4OX0.giqea72-32b0_AhVXyCxQ_6xpjDrd7Z33HcibB8xtNs';
+                
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                
+                logToConsole('✅ Supabase connection established');
+            } catch (error) {
+                logToConsole('❌ Failed to connect to Supabase: ' + error.message, 'error');
+            }
+        }
+        
+        // Initialize Map
+        function initializeMap() {
+            // Center map between driver and destination
+            const centerLat = (locations.driver.lat + locations.destination.lat) / 2;
+            const centerLng = (locations.driver.lng + locations.destination.lng) / 2;
+            
+            map = L.map('map').setView([centerLat, centerLng], 14);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+            
+            // Add destination marker
+            const destinationMarker = L.marker([locations.destination.lat, locations.destination.lng], {
+                icon: L.divIcon({
+                    className: 'destination-marker',
+                    html: '<i class="fas fa-flag-checkered" style="color: #2c7a7b; font-size: 24px;"></i>',
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                })
+            }).addTo(map).bindPopup('Destination');
+            
+            // Add driver marker
+            driverMarker = L.marker([locations.driver.lat, locations.driver.lng], {
+                icon: L.divIcon({
+                    className: 'driver-marker',
+                    html: '<i class="fas fa-car" style="color: #c53030; font-size: 24px;"></i>',
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                })
+            }).addTo(map).bindPopup('Daniel (Driver)');
+            
+            // Add passenger marker
+            passengerMarker = L.marker([locations.passenger.lat, locations.passenger.lng], {
+                icon: L.divIcon({
+                    className: 'passenger-marker',
+                    html: '<i class="fas fa-user" style="color: #6b46c1; font-size: 24px;"></i>',
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                })
+            }).addTo(map).bindPopup('Patty (Passenger)');
+            
+            // Initialize path polyline
+            driverPath = L.polyline([], {
+                color: '#c53030',
+                weight: 3,
+                opacity: 0.7,
+                dashArray: '5, 10'
+            }).addTo(map);
+            
+            // Update initial location displays
+            updateLocationDisplay('driver', locations.driver);
+            updateLocationDisplay('passenger', locations.passenger);
+            
+            // Calculate and display initial ETA and distance
+            updateDistanceAndETA();
+            
+            logToConsole('🗺️ Map initialized');
+        }
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            // Driver buttons
+            document.getElementById('driver-start').addEventListener('click', () => startLocationTracking('driver'));
+            document.getElementById('driver-stop').addEventListener('click', () => stopLocationTracking('driver'));
+            document.getElementById('driver-simulate').addEventListener('click', () => simulateMovement('driver'));
+            document.getElementById('driver-share').addEventListener('click', () => shareLocation('driver'));
+            document.getElementById('driver-save').addEventListener('click', () => saveLocationToDatabase('driver'));
+            
+            // Passenger buttons
+            document.getElementById('passenger-start').addEventListener('click', () => startLocationTracking('passenger'));
+            document.getElementById('passenger-stop').addEventListener('click', () => stopLocationTracking('passenger'));
+            document.getElementById('passenger-simulate').addEventListener('click', () => simulateMovement('passenger'));
+            document.getElementById('passenger-share').addEventListener('click', () => shareLocation('passenger'));
+            document.getElementById('passenger-save').addEventListener('click', () => saveLocationToDatabase('passenger'));
+        }
+        
+        // Start location tracking
+        function startLocationTracking(userType) {
+            const statusElement = document.getElementById(`${userType}-gps-status`);
+            statusElement.textContent = 'Active';
+            statusElement.style.color = '#48bb78';
+            
+            logToConsole(`🛰️ Started ${userType} location tracking`);
+            
+            // In a real implementation, we would use geolocation.watchPosition
+            // For this demo, we'll just update the existing location data
+            updateLocationDisplay(userType, locations[userType]);
+            
+            // Start automatic movement simulation for demo purposes
+            if (userType === 'driver') {
+                if (!driverLocationInterval) {
+                    driverLocationInterval = setInterval(() => {
+                        simulateMovement('driver', true);
+                    }, 5000);
+                }
+            }
+        }
+        
+        // Stop location tracking
+        function stopLocationTracking(userType) {
+            const statusElement = document.getElementById(`${userType}-gps-status`);
+            statusElement.textContent = 'Inactive';
+            statusElement.style.color = '#e53e3e';
+            
+            // Clear intervals
+            if (userType === 'driver' && driverLocationInterval) {
+                clearInterval(driverLocationInterval);
+                driverLocationInterval = null;
+            } else if (userType === 'passenger' && passengerLocationInterval) {
+                clearInterval(passengerLocationInterval);
+                passengerLocationInterval = null;
+            }
+            
+            logToConsole(`🛰️ Stopped ${userType} location tracking`);
+        }
+        
+        // Simulate movement
+        function simulateMovement(userType, isAutomatic = false) {
+            // Generate movement
+            let latChange, lngChange;
+            
+            if (userType === 'driver') {
+                // Move driver toward destination
+                const destLat = locations.destination.lat;
+                const destLng = locations.destination.lng;
+                
+                const currentLat = locations.driver.lat;
+                const currentLng = locations.driver.lng;
+                
+                // Calculate direction vector
+                let latDir = destLat - currentLat;
+                let lngDir = destLng - currentLng;
+                
+                // Normalize and scale
+                const length = Math.sqrt(latDir * latDir + lngDir * lngDir);
+                const moveAmount = 0.0008; // Base movement amount
+                
+                if (length < 0.001) {
+                    // Very close to destination, stop or reset
+                    if (isAutomatic) {
+                        // Reset to starting position for demo purposes
+                        locations.driver.lat = 37.7749;
+                        locations.driver.lng = -122.4194;
+                        // Clear the path
+                        driverPath.setLatLngs([]);
+                        logToConsole('🔄 Driver reached destination, resetting position');
+                    } else {
+                        logToConsole('🏁 Driver has reached the destination');
+                    }
+                } else {
+                    latChange = (latDir / length) * moveAmount * (Math.random() * 0.5 + 0.75);
+                    lngChange = (lngDir / length) * moveAmount * (Math.random() * 0.5 + 0.75);
+                    
+                    // Apply changes
+                    locations.driver.lat += latChange;
+                    locations.driver.lng += lngChange;
+                }
+            } else {
+                // Random small movement for passenger
+                latChange = (Math.random() - 0.5) * 0.0004;
+                lngChange = (Math.random() - 0.5) * 0.0004;
+                
+                locations.passenger.lat += latChange;
+                locations.passenger.lng += lngChange;
+            }
+            
+            // Update marker position
+            if (userType === 'driver') {
+                driverMarker.setLatLng([locations.driver.lat, locations.driver.lng]);
+                
+                // Add point to path
+                const currentPath = driverPath.getLatLngs();
+                currentPath.push([locations.driver.lat, locations.driver.lng]);
+                driverPath.setLatLngs(currentPath);
+                
+            } else {
+                passengerMarker.setLatLng([locations.passenger.lat, locations.passenger.lng]);
+            }
+            
+            // Update location display
+            updateLocationDisplay(userType, locations[userType]);
+            
+            // Update distance and ETA
+            updateDistanceAndETA();
+            
+            if (!isAutomatic) {
+                logToConsole(`🚶 ${userType} moved to new location`);
+            }
+        }
+        
+        // Update location display
+        function updateLocationDisplay(userType, location) {
+            const displayElement = document.getElementById(`${userType}-location`);
+            displayElement.innerHTML = `
+                <strong>Latitude:</strong> ${location.lat.toFixed(6)}<br>
+                <strong>Longitude:</strong> ${location.lng.toFixed(6)}<br>
+                <strong>Accuracy:</strong> ${Math.floor(Math.random() * 10) + 5}m<br>
+                <strong>Last Update:</strong> ${new Date().toLocaleTimeString()}
+            `;
+        }
+        
+        // Calculate and update distance and ETA
+        function updateDistanceAndETA() {
+            // Calculate distance between driver and passenger
+            const driverToPassenger = calculateDistance(
+                locations.driver.lat, locations.driver.lng,
+                locations.passenger.lat, locations.passenger.lng
+            );
+            
+            // Calculate distance to destination
+            const driverToDestination = calculateDistance(
+                locations.driver.lat, locations.driver.lng,
+                locations.destination.lat, locations.destination.lng
+            );
+            
+            // Update displays
+            document.getElementById('driver-distance').textContent = `${driverToDestination.toFixed(2)} km`;
+            
+            // Calculate ETA (assuming 30 km/h average speed)
+            const etaMinutes = Math.round((driverToDestination / 30) * 60);
+            document.getElementById('driver-eta').textContent = `${etaMinutes} min`;
+            
+            // Calculate pickup time
+            const pickupMinutes = Math.round((driverToPassenger / 30) * 60);
+            document.getElementById('pickup-time').textContent = `${pickupMinutes} min`;
+            
+            // Update pickup status
+            if (driverToPassenger < 0.1) {
+                document.getElementById('pickup-status').textContent = 'Arrived';
+                document.getElementById('pickup-status').style.color = '#48bb78';
+            } else if (driverToPassenger < 0.5) {
+                document.getElementById('pickup-status').textContent = 'Nearby';
+                document.getElementById('pickup-status').style.color = '#ed8936';
+            } else {
+                document.getElementById('pickup-status').textContent = 'En Route';
+                document.getElementById('pickup-status').style.color = '#4299e1';
+            }
+        }
+        
+        // Calculate distance between two points (Haversine formula)
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius of the earth in km
+            const dLat = deg2rad(lat2 - lat1);
+            const dLon = deg2rad(lon2 - lon1);
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2)
+            ; 
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+            const distance = R * c; // Distance in km
+            return distance;
+        }
+        
+        function deg2rad(deg) {
+            return deg * (Math.PI/180);
+        }
+        
+        // Share location
+        function shareLocation(userType) {
+            const location = locations[userType];
+            const locationText = `${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}`;
+            
+            // Simulate sharing via clipboard
+            navigator.clipboard.writeText(locationText).then(() => {
+                logToConsole(`📍 ${userType} location copied to clipboard`);
+            });
+            
+            alert(`${userType} location shared: ${locationText}`);
+        }
+        
+        // Save location to database
+        async function saveLocationToDatabase(userType) {
+            if (!supabase) {
+                logToConsole('❌ Supabase not connected', 'error');
+                return;
+            }
+            
+            try {
+                logToConsole(`💾 Saving ${userType} location to database...`);
+                
+                const { data, error } = await supabase
+                    .from('ride_locations')
+                    .insert([{
+                        ride_id: rideId,
+                        user_id: userIds[userType],
+                        latitude: locations[userType].lat,
+                        longitude: locations[userType].lng,
+                        accuracy: Math.floor(Math.random() * 10) + 5,
+                        timestamp: new Date().toISOString()
+                    }]);
+                
+                if (error) {
+                    logToConsole(`❌ Error saving location: ${error.message}`, 'error');
+                } else {
+                    logToConsole(`✅ ${userType} location saved to database`);
+                }
+            } catch (error) {
+                logToConsole(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Console logging
+        function logToConsole(message, type = 'info') {
+            const console = document.getElementById('console');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            
+            let color = '#e2e8f0';
+            if (type === 'success') color = '#48bb78';
+            if (type === 'error') color = '#f56565';
+            if (type === 'warning') color = '#ed8936';
+            
+            logEntry.style.color = color;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            console.appendChild(logEntry);
+            console.scrollTop = console.scrollHeight;
+        }
+    </script>
+</body>
+</html>

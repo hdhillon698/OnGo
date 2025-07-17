@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Stop Testing Page</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #6C63FF;
+        }
+        
+        .header h1 {
+            color: #6C63FF;
+            margin: 0 0 10px 0;
+            font-size: 2rem;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        
+        .test-section h2 {
+            color: #2d3748;
+            margin-top: 0;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        
+        .test-step {
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid #6C63FF;
+        }
+        
+        .test-step h3 {
+            margin: 0 0 10px 0;
+            color: #6C63FF;
+        }
+        
+        .test-step p {
+            margin: 0;
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        .btn {
+            background: #6C63FF;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #5A51DB;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #6C63FF;
+            border: 2px solid #6C63FF;
+        }
+        
+        .btn-secondary:hover {
+            background: #6C63FF;
+            color: white;
+        }
+        
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .success {
+            background: #d1fae5;
+            border: 1px solid #10b981;
+            color: #047857;
+        }
+        
+        .warning {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            color: #92400e;
+        }
+        
+        .info {
+            background: #dbeafe;
+            border: 1px solid #3b82f6;
+            color: #1e40af;
+        }
+        
+        .distance-calc {
+            background: linear-gradient(135deg, #6C63FF, #4FD1C5);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .distance-calc h3 {
+            margin: 0 0 15px 0;
+        }
+        
+        .calculation-step {
+            background: rgba(255,255,255,0.1);
+            padding: 10px 15px;
+            margin: 8px 0;
+            border-radius: 6px;
+            border-left: 3px solid rgba(255,255,255,0.3);
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="test-container">
+        <div class="header">
+            <h1><i class="fas fa-route"></i> Multi-Stop Functionality Testing</h1>
+            <p>Comprehensive testing guide for the OnGoPool multi-stop ride feature</p>
+        </div>
+
+        <!-- Test Plan Section -->
+        <div class="test-section">
+            <h2><i class="fas fa-clipboard-check"></i> Complete Testing Workflow</h2>
+            
+            <div class="test-step">
+                <h3>Step 1: Application Access</h3>
+                <p>Open the main OnGoPool application to begin testing the multi-stop functionality</p>
+                <button class="btn" onclick="window.open('index.html', '_blank')">
+                    <i class="fas fa-external-link-alt"></i> Open OnGoPool App
+                </button>
+            </div>
+            
+            <div class="test-step">
+                <h3>Step 2: User Login</h3>
+                <p>Login with any credentials to access the main dashboard and ride posting features</p>
+                <div class="highlight info">
+                    <strong>Note:</strong> For testing purposes, you can use any email/password combination. The system will simulate a successful login for demonstration.
+                </div>
+            </div>
+            
+            <div class="test-step">
+                <h3>Step 3: Navigate to Post Ride</h3>
+                <p>Click on the "Post" tab in the navigation to access the ride posting form</p>
+            </div>
+            
+            <div class="test-step">
+                <h3>Step 4: Test Multi-Stop Features</h3>
+                <p>Test each of the following multi-stop capabilities:</p>
+                <ul style="margin: 10px 0; padding-left: 30px;">
+                    <li><strong>Add Stops:</strong> Click "Add Stop" button to create intermediate stops</li>
+                    <li><strong>Address Autocomplete:</strong> Type addresses to see Nominatim API suggestions</li>
+                    <li><strong>Remove Stops:</strong> Use the × button to remove unwanted stops</li>
+                    <li><strong>Distance Calculation:</strong> Watch real-time distance updates</li>
+                    <li><strong>Map Visualization:</strong> Observe the route display on the map</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Multi-Stop Distance Calculation Algorithm -->
+        <div class="test-section">
+            <h2><i class="fas fa-calculator"></i> Multi-Stop Distance Calculation Algorithm</h2>
+            
+            <div class="distance-calc">
+                <h3>How Distance Calculation Works Through Multiple Stops</h3>
+                
+                <div class="calculation-step">
+                    <strong>Step 1: Collect All Coordinates</strong><br>
+                    System gathers coordinates for: Start Point → Stop 1 → Stop 2 → ... → End Point
+                </div>
+                
+                <div class="calculation-step">
+                    <strong>Step 2: Calculate Segment Distances</strong><br>
+                    Uses Haversine formula to calculate straight-line distance between each consecutive pair of points
+                </div>
+                
+                <div class="calculation-step">
+                    <strong>Step 3: Apply Road Distance Factor</strong><br>
+                    Multiplies each segment by 1.25 (25% increase) to approximate actual road distance
+                </div>
+                
+                <div class="calculation-step">
+                    <strong>Step 4: Sum All Segments</strong><br>
+                    Total Distance = Σ(distance × 1.25) for all segments in the route
+                </div>
+                
+                <div class="calculation-step">
+                    <strong>Step 5: Calculate Price</strong><br>
+                    Suggests price within platform limits: 0.15-0.25 CAD per seat per kilometer
+                </div>
+            </div>
+            
+            <div class="code-block">
+async function updateRouteAndPrice() {
+    // Get all stop coordinates
+    const allStops = [fromCoords];
+    
+    // Add intermediate stops
+    for (const stop of postStops) {
+        const stopCoords = await getCoordinates(stopValue);
+        if (stopCoords) allStops.push(stopCoords);
+    }
+    
+    allStops.push(toCoords);
+    
+    // Calculate total distance through all stops
+    let totalDistance = 0;
+    for (let i = 0; i < allStops.length - 1; i++) {
+        totalDistance += calculateDistance(
+            allStops[i][0], allStops[i][1], 
+            allStops[i+1][0], allStops[i+1][1]
+        );
+    }
+    
+    // Update pricing and map
+    updatePricing(totalDistance);
+    updateMapWithStops(allStops);
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Earth's radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+             Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+             Math.sin(dLon/2) * Math.sin(dLon/2);
+    
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const straightDistance = R * c;
+    
+    // Add 25% for road distance
+    return straightDistance * 1.25;
+}
+            </div>
+        </div>
+
+        <!-- Example Test Case -->
+        <div class="test-section">
+            <h2><i class="fas fa-map-marked-alt"></i> Example Test Case</h2>
+            
+            <div class="highlight success">
+                <h3>Sample Multi-Stop Route for Testing:</h3>
+                <p><strong>Start:</strong> Toronto, ON, Canada</p>
+                <p><strong>Stop 1:</strong> Mississauga, ON, Canada</p>
+                <p><strong>Stop 2:</strong> Hamilton, ON, Canada</p>
+                <p><strong>End:</strong> Burlington, ON, Canada</p>
+            </div>
+            
+            <div class="test-step">
+                <h3>Expected Results:</h3>
+                <p><strong>Total Distance:</strong> ~85-95 km (depending on exact locations)</p>
+                <p><strong>Estimated Time:</strong> ~120-140 minutes</p>
+                <p><strong>Price Range:</strong> $12.75 - $23.75 CAD per seat</p>
+                <p><strong>Map Display:</strong> Green start marker, blue stop markers, red end marker with connecting polyline</p>
+            </div>
+        </div>
+
+        <!-- Technical Features -->
+        <div class="test-section">
+            <h2><i class="fas fa-cogs"></i> Technical Features to Verify</h2>
+            
+            <div class="test-step">
+                <h3>Address Autocomplete System</h3>
+                <p>Each stop input field should provide real-time address suggestions powered by the Nominatim API as you type</p>
+            </div>
+            
+            <div class="test-step">
+                <h3>Dynamic Stop Management</h3>
+                <p>Users can add up to multiple stops and remove them dynamically. Stop labels automatically renumber when stops are removed</p>
+            </div>
+            
+            <div class="test-step">
+                <h3>Real-time Distance Updates</h3>
+                <p>Distance calculation updates automatically whenever any address field changes, providing immediate feedback</p>
+            </div>
+            
+            <div class="test-step">
+                <h3>Interactive Map Visualization</h3>
+                <p>Leaflet map displays the complete route with color-coded markers and automatically fits the view to show all stops</p>
+            </div>
+            
+            <div class="test-step">
+                <h3>Price Constraint Validation</h3>
+                <p>System enforces OnGoPool's pricing limits (0.15-0.25 CAD per km) and suggests optimal pricing within this range</p>
+            </div>
+        </div>
+
+        <!-- Status Check -->
+        <div class="test-section">
+            <h2><i class="fas fa-check-circle"></i> Testing Status</h2>
+            
+            <div class="highlight success">
+                <h3>✅ Fixed Issues:</h3>
+                <p>Resolved duplicate variable declarations (<code>postStops</code> and <code>stopCounter</code>) that were preventing the application from loading</p>
+            </div>
+            
+            <div class="highlight info">
+                <h3>🔄 Ready for Testing:</h3>
+                <p>All multi-stop functionality is now operational and ready for comprehensive testing. No JavaScript errors should occur during normal operation.</p>
+            </div>
+            
+            <div class="highlight warning">
+                <h3>⚠️ Testing Notes:</h3>
+                <p>Remember that this is a demonstration system. Stripe payment processing is in test mode, and some advanced features may use simulated data for testing purposes.</p>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div style="text-align: center; margin-top: 30px;">
+            <button class="btn" onclick="window.open('index.html', '_blank')">
+                <i class="fas fa-play"></i> Start Testing Now
+            </button>
+            <button class="btn btn-secondary" onclick="window.open('test_stops_functionality.html', '_blank')">
+                <i class="fas fa-info-circle"></i> View Implementation Details
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Auto-scroll to top on page load
+        window.addEventListener('load', () => {
+            window.scrollTo(0, 0);
+        });
+    </script>
+</body>
+</html>
