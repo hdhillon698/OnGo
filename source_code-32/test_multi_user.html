@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OnGoPool - Multi-User Testing</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+        }
+
+        .test-users {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .user-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .user-role {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        .role-driver {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .role-passenger {
+            background: #d6bcfa;
+            color: #6b46c1;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin: 0.25rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        .btn-success { background: #48bb78; }
+        .btn-warning { background: #ed8936; }
+        .btn-danger { background: #f56565; }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .activity-log {
+            max-height: 200px;
+            overflow-y: auto;
+            background: #1a202c;
+            color: #e2e8f0;
+            border-radius: 10px;
+            padding: 1rem;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.85rem;
+        }
+
+        .log-entry {
+            margin-bottom: 0.25rem;
+            padding-bottom: 0.25rem;
+            border-bottom: 1px solid #2d3748;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .chat-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .chat-box {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: #667eea;
+            color: white;
+            padding: 1rem;
+            font-weight: 600;
+        }
+
+        .chat-messages {
+            height: 300px;
+            padding: 1rem;
+            overflow-y: auto;
+            background: #f8fafc;
+        }
+
+        .chat-message {
+            padding: 0.5rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 12px;
+            max-width: 80%;
+        }
+
+        .chat-message.driver {
+            background: #fed7d7;
+            margin-left: auto;
+        }
+
+        .chat-message.passenger {
+            background: #d6bcfa;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 1rem;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-right: 0.5rem;
+        }
+
+        .location-tracking {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 2rem 0;
+        }
+
+        .map-container {
+            height: 400px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+            border: 1px solid #e2e8f0;
+        }
+
+        .location-status {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .location-user {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .console {
+            background: #1a202c;
+            color: #e2e8f0;
+            border-radius: 10px;
+            padding: 1rem;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.85rem;
+            height: 200px;
+            overflow-y: auto;
+            margin-top: 2rem;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            border-bottom-color: #667eea;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Fix for tab display */
+        #chat-tab {
+            display: block;
+        }
+        
+        #location-tab, #notification-tab {
+            display: none;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            max-width: 350px;
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #fed7d7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+            color: #c53030;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-users"></i> Multi-User Testing Dashboard</h1>
+            <p>Simulate multiple users interacting with real-time features</p>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="chat-tab" onclick="switchTab('chat-tab')">Chat Testing</div>
+            <div class="tab" data-tab="location-tab" onclick="switchTab('location-tab')">Location Tracking</div>
+            <div class="tab" data-tab="notification-tab" onclick="switchTab('notification-tab')">Push Notifications</div>
+        </div>
+
+        <div class="tab-content active" id="chat-tab">
+            <h2><i class="fas fa-comments"></i> Real-time Chat Testing</h2>
+            <p>Simulate chat conversation between driver and passenger</p>
+
+            <div class="test-users">
+                <div class="user-card">
+                    <div class="user-header">
+                        <div class="user-avatar">D</div>
+                        <div>
+                            <h3>Driver User</h3>
+                            <p>Daniel Driver</p>
+                        </div>
+                        <span class="user-role role-driver">Driver</span>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn" onclick="connectUserRealtime('driver')">Connect Real-time</button>
+                        <button class="btn btn-success" onclick="sendMessage('driver')">Send Message</button>
+                    </div>
+                    <div class="activity-log" id="driver-log"></div>
+                </div>
+
+                <div class="user-card">
+                    <div class="user-header">
+                        <div class="user-avatar">P</div>
+                        <div>
+                            <h3>Passenger User</h3>
+                            <p>Patty Passenger</p>
+                        </div>
+                        <span class="user-role role-passenger">Passenger</span>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn" onclick="connectUserRealtime('passenger')">Connect Real-time</button>
+                        <button class="btn btn-success" onclick="sendMessage('passenger')">Send Message</button>
+                    </div>
+                    <div class="activity-log" id="passenger-log"></div>
+                </div>
+            </div>
+
+            <div class="chat-section">
+                <div class="chat-box">
+                    <div class="chat-header">
+                        <i class="fas fa-car"></i> Driver View - Daniel
+                    </div>
+                    <div class="chat-messages" id="driver-chat">
+                        <!-- Messages will appear here -->
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="driver-input" placeholder="Type a message...">
+                        <button class="btn" onclick="sendChatMessage('driver')">Send</button>
+                    </div>
+                </div>
+
+                <div class="chat-box">
+                    <div class="chat-header">
+                        <i class="fas fa-user"></i> Passenger View - Patty
+                    </div>
+                    <div class="chat-messages" id="passenger-chat">
+                        <!-- Messages will appear here -->
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="passenger-input" placeholder="Type a message...">
+                        <button class="btn" onclick="sendChatMessage('passenger')">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="location-tab">
+            <h2><i class="fas fa-map-marker-alt"></i> Location Tracking Testing</h2>
+            <p>Simulate GPS location updates between driver and passenger</p>
+
+            <div class="test-users">
+                <div class="user-card">
+                    <div class="user-header">
+                        <div class="user-avatar">D</div>
+                        <div>
+                            <h3>Driver User</h3>
+                            <p>Daniel Driver</p>
+                        </div>
+                        <span class="user-role role-driver">Driver</span>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn" onclick="startLocationTracking('driver')">Start Tracking</button>
+                        <button class="btn btn-warning" onclick="simulateMovement('driver')">Simulate Movement</button>
+                        <button class="btn btn-danger" onclick="stopLocationTracking('driver')">Stop Tracking</button>
+                    </div>
+                    <div class="location-status" id="driver-location-status">
+                        GPS: Inactive
+                    </div>
+                </div>
+
+                <div class="user-card">
+                    <div class="user-header">
+                        <div class="user-avatar">P</div>
+                        <div>
+                            <h3>Passenger User</h3>
+                            <p>Patty Passenger</p>
+                        </div>
+                        <span class="user-role role-passenger">Passenger</span>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn" onclick="startLocationTracking('passenger')">Start Tracking</button>
+                        <button class="btn btn-warning" onclick="simulateMovement('passenger')">Simulate Movement</button>
+                        <button class="btn btn-danger" onclick="stopLocationTracking('passenger')">Stop Tracking</button>
+                    </div>
+                    <div class="location-status" id="passenger-location-status">
+                        GPS: Inactive
+                    </div>
+                </div>
+            </div>
+
+            <div class="location-tracking">
+                <h3>Live Tracking Map</h3>
+                <div class="map-container" id="tracking-map">
+                    <!-- Map will be loaded here -->
+                    <p style="text-align: center; padding-top: 180px;">
+                        Click 'Simulate Movement' to see location updates on the map
+                    </p>
+                </div>
+                <div class="location-status">
+                    <div class="location-user">
+                        <h4>Driver Location</h4>
+                        <div id="driver-coordinates">Not tracking</div>
+                    </div>
+                    <div class="location-user">
+                        <h4>Passenger Location</h4>
+                        <div id="passenger-coordinates">Not tracking</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="notification-tab">
+            <h2><i class="fas fa-bell"></i> Push Notification Testing</h2>
+            <p>Test browser push notifications between users</p>
+
+            <div class="test-users">
+                <div class="user-card">
+                    <div class="user-header">
+                        <div class="user-avatar">D</div>
+                        <div>
+                            <h3>Driver User</h3>
+                            <p>Daniel Driver</p>
+                        </div>
+                        <span class="user-role role-driver">Driver</span>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn" onclick="requestNotificationPermission('driver')">Request Permission</button>
+                        <button class="btn btn-success" onclick="subscribeToPush('driver')">Subscribe to Push</button>
+                        <button class="btn btn-warning" onclick="sendTestNotification('driver')">Test Notification</button>
+                    </div>
+                    <div class="activity-log" id="driver-notification-log"></div>
+                </div>
+
+                <div class="user-card">
+                    <div class="user-header">
+                        <div class="user-avatar">P</div>
+                        <div>
+                            <h3>Passenger User</h3>
+                            <p>Patty Passenger</p>
+                        </div>
+                        <span class="user-role role-passenger">Passenger</span>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn" onclick="requestNotificationPermission('passenger')">Request Permission</button>
+                        <button class="btn btn-success" onclick="subscribeToPush('passenger')">Subscribe to Push</button>
+                        <button class="btn btn-warning" onclick="sendTestNotification('passenger')">Test Notification</button>
+                    </div>
+                    <div class="activity-log" id="passenger-notification-log"></div>
+                </div>
+            </div>
+
+            <div class="user-card" style="margin-top: 2rem;">
+                <h3><i class="fas fa-paper-plane"></i> Send Cross-User Notifications</h3>
+                <p>Send notifications from one user to another</p>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                    <div>
+                        <h4>Driver to Passenger</h4>
+                        <div class="action-buttons">
+                            <button class="btn" onclick="sendCrossUserNotification('driver', 'passenger', 'I\'ve arrived at the pickup location!')">Arrival Notice</button>
+                            <button class="btn" onclick="sendCrossUserNotification('driver', 'passenger', 'I\'ll be 5 minutes late due to traffic')">Delay Notice</button>
+                            <button class="btn" onclick="sendCrossUserNotification('driver', 'passenger', 'Ride completed. Thanks for riding with me!')">Ride Complete</button>
+                        </div>
+                    </div>
+                    <div>
+                        <h4>Passenger to Driver</h4>
+                        <div class="action-buttons">
+                            <button class="btn" onclick="sendCrossUserNotification('passenger', 'driver', 'I\'m ready for pickup now')">Ready for Pickup</button>
+                            <button class="btn" onclick="sendCrossUserNotification('passenger', 'driver', 'I\'ll be 2 minutes late to the pickup spot')">Delay Notice</button>
+                            <button class="btn" onclick="sendCrossUserNotification('passenger', 'driver', 'Can you drop me at a different location?')">Change Request</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="console" id="global-console">
+            <!-- Global log entries will appear here -->
+        </div>
+
+        <div class="notification" id="test-notification">
+            <div class="notification-header">
+                <div class="notification-icon">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="notification-title">New Message</div>
+                <button class="notification-close" onclick="closeNotification()">&times;</button>
+            </div>
+            <div class="notification-body" id="notification-message">
+                Notification message will appear here.
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase and required scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <script>
+        // Global variables
+        let supabase;
+        let map;
+        let driverMarker;
+        let passengerMarker;
+        let driverLocationInterval;
+        let passengerLocationInterval;
+        let chatChannel;
+        
+        // Fix for tabs - manually handle tab switching
+        function switchTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Show the selected tab content
+            document.getElementById(tabId).style.display = 'block';
+            
+            // Update active tab styling
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.getAttribute('data-tab') === tabId) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // Initialize map when switching to location tab
+            if (tabId === 'location-tab' && !map) {
+                initializeMap();
+            }
+        }
+
+        // Mock user IDs
+        const userIds = {
+            driver: '00000000-0000-0000-0000-000000000001',
+            passenger: '00000000-0000-0000-0000-000000000002'
+        };
+
+        // Mock ride ID
+        const rideId = '00000000-0000-0000-0000-000000000003';
+
+        // Starting locations (San Francisco area)
+        const locations = {
+            driver: { lat: 37.7749, lng: -122.4194 },
+            passenger: { lat: 37.7850, lng: -122.4100 }
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSupabase();
+            setupTabs();
+            logToConsole('🚀 Multi-user testing dashboard initialized');
+        });
+
+        // Supabase initialization
+        function initializeSupabase() {
+            try {
+                const SUPABASE_URL = 'https://efjwsdxgelbgthcyltjr.supabase.co';
+                const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmandzZHhnZWxiZ3RoY3lsdGpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3OTUwODksImV4cCI6MjA2NjM3MTA4OX0.giqea72-32b0_AhVXyCxQ_6xpjDrd7Z33HcibB8xtNs';
+                
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                
+                logToConsole('✅ Supabase connection established');
+            } catch (error) {
+                logToConsole('❌ Failed to connect to Supabase: ' + error.message, 'error');
+            }
+        }
+
+        // Set up tabs
+        function setupTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    switchTab(tabId);
+                });
+            });
+        }
+
+        // Chat Functions
+        function connectUserRealtime(userType) {
+            if (!supabase) {
+                logToUserConsole(userType, '❌ Supabase not connected');
+                return;
+            }
+
+            logToUserConsole(userType, '🔌 Connecting to real-time updates...');
+
+            // Create a shared channel for both users
+            if (!chatChannel) {
+                chatChannel = supabase
+                    .channel('chat-test')
+                    .on('broadcast', { event: 'chat-message' }, (payload) => {
+                        logToConsole(`📨 Received chat message: ${JSON.stringify(payload)}`);
+                        receiveChatMessage(payload.payload);
+                    })
+                    .subscribe((status) => {
+                        logToConsole(`Chat channel status: ${status}`);
+                    });
+            }
+
+            logToUserConsole(userType, '✅ Connected to real-time chat');
+        }
+
+        function sendChatMessage(userType) {
+            const inputElement = document.getElementById(`${userType}-input`);
+            const message = inputElement.value.trim();
+            
+            if (!message) return;
+            
+            if (!chatChannel) {
+                logToUserConsole(userType, '❌ Not connected to chat channel');
+                return;
+            }
+
+            const chatMessage = {
+                sender: userType,
+                senderId: userIds[userType],
+                message: message,
+                timestamp: new Date().toISOString()
+            };
+
+            // Send message through the broadcast channel
+            chatChannel.send({
+                type: 'broadcast',
+                event: 'chat-message',
+                payload: chatMessage
+            });
+
+            // Add message to both chat views
+            addMessageToChat(userType, message, userType);
+            
+            logToUserConsole(userType, `📤 Sent message: ${message}`);
+            inputElement.value = '';
+        }
+
+        function receiveChatMessage(messageData) {
+            const { sender, message } = messageData;
+            
+            // Add message to the other user's chat
+            const otherUser = sender === 'driver' ? 'passenger' : 'driver';
+            addMessageToChat(otherUser, message, sender);
+            
+            logToUserConsole(otherUser, `📥 Received message: ${message}`);
+            
+            // Simulate notification
+            if (Notification.permission === 'granted') {
+                showNotification(otherUser, `New message from ${capitalizeFirstLetter(sender)}`, message);
+            }
+        }
+
+        function addMessageToChat(viewerType, message, senderType) {
+            const chatContainer = document.getElementById(`${viewerType}-chat`);
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${senderType}`;
+            
+            const senderName = senderType === 'driver' ? 'Daniel' : 'Patty';
+            messageDiv.innerHTML = `<strong>${senderName}:</strong> ${message}`;
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Location Functions
+        function initializeMap() {
+            // Create map centered between driver and passenger
+            const centerLat = (locations.driver.lat + locations.passenger.lat) / 2;
+            const centerLng = (locations.driver.lng + locations.passenger.lng) / 2;
+            
+            map = L.map('tracking-map').setView([centerLat, centerLng], 14);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+            
+            // Create initial markers
+            driverMarker = L.marker([locations.driver.lat, locations.driver.lng], {
+                icon: L.divIcon({
+                    className: 'custom-marker',
+                    html: '<i class="fas fa-car" style="color: #c53030; font-size: 24px;"></i>',
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                })
+            }).addTo(map).bindPopup('Daniel (Driver)');
+            
+            passengerMarker = L.marker([locations.passenger.lat, locations.passenger.lng], {
+                icon: L.divIcon({
+                    className: 'custom-marker',
+                    html: '<i class="fas fa-user" style="color: #6b46c1; font-size: 24px;"></i>',
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                })
+            }).addTo(map).bindPopup('Patty (Passenger)');
+            
+            // Update coordinate displays
+            updateCoordinateDisplay('driver', locations.driver);
+            updateCoordinateDisplay('passenger', locations.passenger);
+            
+            logToConsole('🗺️ Map initialized');
+        }
+
+        function startLocationTracking(userType) {
+            if (userType === 'driver' && driverLocationInterval) {
+                logToConsole('⚠️ Driver location tracking already active', 'warning');
+                return;
+            }
+            
+            if (userType === 'passenger' && passengerLocationInterval) {
+                logToConsole('⚠️ Passenger location tracking already active', 'warning');
+                return;
+            }
+            
+            document.getElementById(`${userType}-location-status`).innerHTML = `
+                <strong>GPS:</strong> <span style="color: #48bb78;">Active</span>
+            `;
+            
+            logToConsole(`🛰️ Started ${userType} location tracking`);
+            logToUserConsole(userType, '🛰️ Location tracking started');
+            
+            // Update location status
+            updateCoordinateDisplay(userType, locations[userType]);
+            
+            // In a real implementation, we would use navigator.geolocation.watchPosition here
+        }
+
+        function stopLocationTracking(userType) {
+            if (userType === 'driver' && driverLocationInterval) {
+                clearInterval(driverLocationInterval);
+                driverLocationInterval = null;
+            }
+            
+            if (userType === 'passenger' && passengerLocationInterval) {
+                clearInterval(passengerLocationInterval);
+                passengerLocationInterval = null;
+            }
+            
+            document.getElementById(`${userType}-location-status`).innerHTML = `
+                <strong>GPS:</strong> <span style="color: #e53e3e;">Inactive</span>
+            `;
+            
+            logToConsole(`🛰️ Stopped ${userType} location tracking`);
+            logToUserConsole(userType, '🛰️ Location tracking stopped');
+        }
+
+        function simulateMovement(userType) {
+            if (!map) {
+                initializeMap();
+            }
+            
+            // Generate a small random movement
+            const latChange = (Math.random() - 0.5) * 0.003;
+            const lngChange = (Math.random() - 0.5) * 0.003;
+            
+            locations[userType].lat += latChange;
+            locations[userType].lng += lngChange;
+            
+            // Update the marker position
+            if (userType === 'driver' && driverMarker) {
+                driverMarker.setLatLng([locations.driver.lat, locations.driver.lng]);
+            } else if (userType === 'passenger' && passengerMarker) {
+                passengerMarker.setLatLng([locations.passenger.lat, locations.passenger.lng]);
+            }
+            
+            // Update coordinate display
+            updateCoordinateDisplay(userType, locations[userType]);
+            
+            // Save to database
+            saveLocationToDatabase(userType);
+            
+            logToUserConsole(userType, `🚶 Moved to: ${locations[userType].lat.toFixed(6)}, ${locations[userType].lng.toFixed(6)}`);
+        }
+
+        async function saveLocationToDatabase(userType) {
+            if (!supabase) return;
+            
+            try {
+                const { data, error } = await supabase
+                    .from('ride_locations')
+                    .insert([{
+                        ride_id: rideId,
+                        user_id: userIds[userType],
+                        latitude: locations[userType].lat,
+                        longitude: locations[userType].lng,
+                        accuracy: Math.floor(Math.random() * 10) + 5,
+                        timestamp: new Date().toISOString()
+                    }]);
+                
+                if (error) {
+                    logToConsole(`❌ Error saving location: ${error.message}`, 'error');
+                } else {
+                    logToConsole(`✅ Saved ${userType} location to database`);
+                    
+                    // Notify the other user
+                    const otherUser = userType === 'driver' ? 'passenger' : 'driver';
+                    showNotification(otherUser, `${capitalizeFirstLetter(userType)} Location Updated`, 
+                        `${capitalizeFirstLetter(userType)} location changed to ${locations[userType].lat.toFixed(4)}, ${locations[userType].lng.toFixed(4)}`);
+                }
+            } catch (error) {
+                logToConsole(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        function updateCoordinateDisplay(userType, location) {
+            document.getElementById(`${userType}-coordinates`).innerHTML = `
+                <strong>Latitude:</strong> ${location.lat.toFixed(6)}<br>
+                <strong>Longitude:</strong> ${location.lng.toFixed(6)}<br>
+                <strong>Last Update:</strong> ${new Date().toLocaleTimeString()}
+            `;
+        }
+
+        // Notification Functions
+        function requestNotificationPermission(userType) {
+            if (!('Notification' in window)) {
+                logToUserConsole(userType, '❌ This browser does not support notifications');
+                return;
+            }
+
+            Notification.requestPermission().then(permission => {
+                logToUserConsole(userType, `🔔 Notification permission: ${permission}`);
+                
+                if (permission === 'granted') {
+                    logToUserConsole(userType, '✅ Notification permission granted');
+                }
+            });
+        }
+
+        async function subscribeToPush(userType) {
+            if (!supabase) {
+                logToUserConsole(userType, '❌ Supabase not connected');
+                return;
+            }
+            
+            if (Notification.permission !== 'granted') {
+                logToUserConsole(userType, '❌ Notification permission not granted');
+                return;
+            }
+            
+            logToUserConsole(userType, '🔔 Subscribing to push notifications...');
+            
+            // In a real implementation, we would register the service worker 
+            // and use the Push API to get subscription details
+            
+            // For this demo, we'll simulate with mock subscription data
+            try {
+                const { data, error } = await supabase
+                    .from('notification_subscriptions')
+                    .insert([{
+                        user_id: userIds[userType],
+                        endpoint: `https://fake-push-service.com/endpoint-${userType}-${Date.now()}`,
+                        p256dh: 'BNcRdreALRFXTkOOUHK1EtK2wtaz5Ry4YfYCA_0QTpQtfZOc6rrVHS-6hpgDjyRCh7B3oxuzpQsDHDD5P7raqaE',
+                        auth: 'Q2BoAjC09xam_Nv1xKTNfA'
+                    }]);
+                
+                if (error) {
+                    logToUserConsole(userType, `❌ Error subscribing: ${error.message}`);
+                } else {
+                    logToUserConsole(userType, '✅ Successfully subscribed to push notifications');
+                }
+            } catch (error) {
+                logToUserConsole(userType, `❌ Error: ${error.message}`);
+            }
+        }
+
+        function sendTestNotification(userType) {
+            if (Notification.permission !== 'granted') {
+                logToUserConsole(userType, '❌ Notification permission not granted');
+                return;
+            }
+            
+            const title = `OnGoPool Test for ${capitalizeFirstLetter(userType)}`;
+            const options = {
+                body: `This is a test notification for ${userType} user`,
+                icon: '/favicon.ico'
+            };
+            
+            const notification = new Notification(title, options);
+            
+            logToUserConsole(userType, '🔔 Test notification sent');
+            
+            // Also show in the notification demo
+            showNotification(userType, title, options.body);
+        }
+
+        function sendCrossUserNotification(fromUser, toUser, message) {
+            logToUserConsole(fromUser, `📤 Sending notification to ${toUser}: ${message}`);
+            
+            // Show notification for receiver
+            showNotification(toUser, `Message from ${capitalizeFirstLetter(fromUser)}`, message);
+            
+            logToUserConsole(toUser, `📥 Received notification from ${fromUser}: ${message}`);
+        }
+
+        function showNotification(userType, title, message) {
+            const notificationElement = document.getElementById('test-notification');
+            document.querySelector('.notification-title').textContent = title;
+            document.getElementById('notification-message').textContent = message;
+            
+            notificationElement.classList.add('show');
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                closeNotification();
+            }, 5000);
+        }
+
+        function closeNotification() {
+            document.getElementById('test-notification').classList.remove('show');
+        }
+
+        // Utility Functions
+        function sendMessage(userType) {
+            logToUserConsole(userType, '📤 Sending test message...');
+            
+            // If using chat, automatically fill the input
+            document.getElementById(`${userType}-input`).value = getRandomMessage(userType);
+        }
+
+        function getRandomMessage(userType) {
+            const driverMessages = [
+                "I've arrived at the pickup location",
+                "I'm 5 minutes away",
+                "Traffic is a bit heavy, might be late",
+                "I'm in a blue Honda Civic",
+                "I'll wait at the entrance"
+            ];
+            
+            const passengerMessages = [
+                "I'll be right out",
+                "I'm waiting at the corner",
+                "Could you call me when you arrive?",
+                "I'm wearing a red jacket",
+                "Thank you for waiting"
+            ];
+            
+            const messages = userType === 'driver' ? driverMessages : passengerMessages;
+            return messages[Math.floor(Math.random() * messages.length)];
+        }
+
+        function logToConsole(message, type = 'info') {
+            const console = document.getElementById('global-console');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            
+            let color = '#e2e8f0';
+            if (type === 'success') color = '#48bb78';
+            if (type === 'error') color = '#f56565';
+            if (type === 'warning') color = '#ed8936';
+            
+            logEntry.style.color = color;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            console.appendChild(logEntry);
+            console.scrollTop = console.scrollHeight;
+        }
+
+        function logToUserConsole(userType, message) {
+            const logElement = document.getElementById(`${userType}-log`);
+            if (!logElement) return;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            
+            logElement.appendChild(logEntry);
+            logElement.scrollTop = logElement.scrollHeight;
+            
+            // Also log to driver-notification-log if on notification tab
+            const notifLogElement = document.getElementById(`${userType}-notification-log`);
+            if (notifLogElement && message.includes('notification')) {
+                const notifEntry = document.createElement('div');
+                notifEntry.className = 'log-entry';
+                notifEntry.textContent = `[${timestamp}] ${message}`;
+                notifLogElement.appendChild(notifEntry);
+                notifLogElement.scrollTop = notifLogElement.scrollHeight;
+            }
+        }
+
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-step {
+            margin: 10px 0;
+            padding: 10px;
+            border-left: 4px solid #007bff;
+            background: #f8f9fa;
+        }
+        .error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+        .success {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+        .warning {
+            border-left-color: #ffc107;
+            background: #fff3cd;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Admin Dashboard Test Suite</h1>
+        <p>This test will systematically check the admin dashboard functionality and identify any issues.</p>
+        
+        <div class="test-step">
+            <strong>Step 1: Load Application</strong>
+            <button onclick="loadApp()">Load Main App</button>
+            <div id="step1-result"></div>
+        </div>
+        
+        <div class="test-step">
+            <strong>Step 2: Access Admin Login</strong>
+            <button onclick="testAdminLogin()">Click Admin Login</button>
+            <div id="step2-result"></div>
+        </div>
+        
+        <div class="test-step">
+            <strong>Step 3: Enter Demo Credentials</strong>
+            <button onclick="enterCredentials()">Enter admin@ongopool.com / admin123</button>
+            <div id="step3-result"></div>
+        </div>
+        
+        <div class="test-step">
+            <strong>Step 4: Submit Login</strong>
+            <button onclick="submitLogin()">Submit Login Form</button>
+            <div id="step4-result"></div>
+        </div>
+        
+        <div class="test-step">
+            <strong>Step 5: Check Dashboard</strong>
+            <button onclick="checkDashboard()">Verify Dashboard Loads</button>
+            <div id="step5-result"></div>
+        </div>
+        
+        <div class="test-step">
+            <strong>Step 6: Test License Verification Tab</strong>
+            <button onclick="testLicenseTab()">Click License Verification</button>
+            <div id="step6-result"></div>
+        </div>
+        
+        <div id="console-output" style="margin-top: 20px; padding: 10px; background: #f8f9fa; border-radius: 4px; white-space: pre-wrap; font-family: monospace; max-height: 200px; overflow-y: auto;"></div>
+        
+        <iframe id="app-frame" src="about:blank"></iframe>
+    </div>
+
+    <script>
+        let appFrame;
+        let appWindow;
+        let logs = [];
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `[${timestamp}] ${message}`;
+            logs.push(logMessage);
+            
+            const consoleOutput = document.getElementById('console-output');
+            consoleOutput.textContent = logs.join('\n');
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            
+            console.log(logMessage);
+        }
+        
+        function showResult(stepId, message, type = 'info') {
+            const resultDiv = document.getElementById(stepId);
+            resultDiv.innerHTML = `<div class="${type}">${message}</div>`;
+        }
+        
+        function loadApp() {
+            log('Loading main application...');
+            appFrame = document.getElementById('app-frame');
+            appFrame.src = './index.html';
+            
+            appFrame.onload = function() {
+                try {
+                    appWindow = appFrame.contentWindow;
+                    log('✅ Application loaded successfully');
+                    showResult('step1-result', '✅ App loaded - Ready for testing', 'success');
+                    
+                    // Capture console messages from the iframe
+                    const originalConsole = appWindow.console;
+                    appWindow.console = {
+                        ...originalConsole,
+                        log: function(...args) {
+                            log(`APP LOG: ${args.join(' ')}`);
+                            originalConsole.log.apply(originalConsole, args);
+                        },
+                        error: function(...args) {
+                            log(`APP ERROR: ${args.join(' ')}`);
+                            originalConsole.error.apply(originalConsole, args);
+                        },
+                        warn: function(...args) {
+                            log(`APP WARN: ${args.join(' ')}`);
+                            originalConsole.warn.apply(originalConsole, args);
+                        }
+                    };
+                } catch (error) {
+                    log(`❌ Error accessing app window: ${error.message}`);
+                    showResult('step1-result', `❌ Error: ${error.message}`, 'error');
+                }
+            };
+            
+            appFrame.onerror = function(error) {
+                log(`❌ Frame error: ${error}`);
+                showResult('step1-result', `❌ Frame error: ${error}`, 'error');
+            };
+        }
+        
+        function testAdminLogin() {
+            if (!appWindow) {
+                showResult('step2-result', '❌ App not loaded yet', 'error');
+                return;
+            }
+            
+            try {
+                log('Clicking Admin Login button...');
+                appWindow.showPage('admin-login-page');
+                
+                setTimeout(() => {
+                    const loginPage = appWindow.document.getElementById('admin-login-page');
+                    if (loginPage && loginPage.style.display !== 'none') {
+                        log('✅ Admin login page displayed');
+                        showResult('step2-result', '✅ Admin login page opened successfully', 'success');
+                    } else {
+                        log('❌ Admin login page not visible');
+                        showResult('step2-result', '❌ Admin login page not visible', 'error');
+                    }
+                }, 500);
+                
+            } catch (error) {
+                log(`❌ Error accessing admin login: ${error.message}`);
+                showResult('step2-result', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        function enterCredentials() {
+            if (!appWindow) {
+                showResult('step3-result', '❌ App not loaded yet', 'error');
+                return;
+            }
+            
+            try {
+                const emailField = appWindow.document.getElementById('admin-email');
+                const passwordField = appWindow.document.getElementById('admin-password');
+                
+                if (!emailField || !passwordField) {
+                    log('❌ Admin form fields not found');
+                    showResult('step3-result', '❌ Admin form fields not found', 'error');
+                    return;
+                }
+                
+                emailField.value = 'admin@ongopool.com';
+                passwordField.value = 'admin123';
+                
+                log('✅ Demo credentials entered');
+                showResult('step3-result', '✅ Credentials entered: admin@ongopool.com / admin123', 'success');
+                
+            } catch (error) {
+                log(`❌ Error entering credentials: ${error.message}`);
+                showResult('step3-result', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        function submitLogin() {
+            if (!appWindow) {
+                showResult('step4-result', '❌ App not loaded yet', 'error');
+                return;
+            }
+            
+            try {
+                log('Submitting admin login form...');
+                
+                // Create a fake event for the form submission
+                const form = appWindow.document.querySelector('#admin-login-page form');
+                if (!form) {
+                    log('❌ Admin login form not found');
+                    showResult('step4-result', '❌ Admin login form not found', 'error');
+                    return;
+                }
+                
+                const event = new appWindow.Event('submit', { bubbles: true, cancelable: true });
+                appWindow.adminLogin(event);
+                
+                // Wait a moment and check if dashboard appeared
+                setTimeout(() => {
+                    const dashboard = appWindow.document.getElementById('admin-dashboard');
+                    if (dashboard && dashboard.style.display !== 'none') {
+                        log('✅ Admin dashboard loaded successfully');
+                        showResult('step4-result', '✅ Login successful - Dashboard loaded', 'success');
+                    } else {
+                        log('❌ Admin dashboard not loaded');
+                        showResult('step4-result', '❌ Dashboard not loaded - Login may have failed', 'error');
+                    }
+                }, 2000);
+                
+            } catch (error) {
+                log(`❌ Error submitting login: ${error.message}`);
+                showResult('step4-result', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        function checkDashboard() {
+            if (!appWindow) {
+                showResult('step5-result', '❌ App not loaded yet', 'error');
+                return;
+            }
+            
+            try {
+                const dashboard = appWindow.document.getElementById('admin-dashboard');
+                if (!dashboard) {
+                    log('❌ Admin dashboard element not found in DOM');
+                    showResult('step5-result', '❌ Dashboard element not found', 'error');
+                    return;
+                }
+                
+                const isVisible = dashboard.style.display !== 'none';
+                const hasContent = dashboard.innerHTML.trim().length > 0;
+                
+                log(`Dashboard visibility: ${isVisible}`);
+                log(`Dashboard has content: ${hasContent}`);
+                
+                if (isVisible && hasContent) {
+                    log('✅ Dashboard is visible and has content');
+                    showResult('step5-result', '✅ Dashboard is properly loaded and visible', 'success');
+                } else if (isVisible && !hasContent) {
+                    log('⚠️ Dashboard is visible but empty');
+                    showResult('step5-result', '⚠️ Dashboard visible but empty', 'warning');
+                } else {
+                    log('❌ Dashboard is not visible');
+                    showResult('step5-result', '❌ Dashboard is not visible', 'error');
+                }
+                
+            } catch (error) {
+                log(`❌ Error checking dashboard: ${error.message}`);
+                showResult('step5-result', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        function testLicenseTab() {
+            if (!appWindow) {
+                showResult('step6-result', '❌ App not loaded yet', 'error');
+                return;
+            }
+            
+            try {
+                log('Testing license verification tab...');
+                
+                // Look for the license verification tab
+                const licenseTab = appWindow.document.querySelector('[data-tab="verification"]');
+                if (!licenseTab) {
+                    log('❌ License verification tab not found');
+                    showResult('step6-result', '❌ License verification tab not found', 'error');
+                    return;
+                }
+                
+                // Click the tab
+                licenseTab.click();
+                
+                setTimeout(() => {
+                    const licenseGrid = appWindow.document.getElementById('license-grid');
+                    if (licenseGrid) {
+                        const hasData = licenseGrid.innerHTML.includes('Loading') || licenseGrid.innerHTML.includes('license');
+                        if (hasData) {
+                            log('✅ License verification tab working');
+                            showResult('step6-result', '✅ License verification tab loads content', 'success');
+                        } else {
+                            log('⚠️ License tab clicked but no content loaded');
+                            showResult('step6-result', '⚠️ Tab loads but no content', 'warning');
+                        }
+                    } else {
+                        log('❌ License grid not found');
+                        showResult('step6-result', '❌ License grid element not found', 'error');
+                    }
+                }, 2000);
+                
+            } catch (error) {
+                log(`❌ Error testing license tab: ${error.message}`);
+                showResult('step6-result', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Auto-load the app when page loads
+        window.onload = function() {
+            log('Test suite initialized');
+        };
+    </script>
+</body>
+</html>

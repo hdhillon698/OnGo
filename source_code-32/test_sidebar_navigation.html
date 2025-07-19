@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Sidebar Navigation Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { 
+            margin: 20px 0; 
+            padding: 20px; 
+            border: 1px solid #ddd; 
+            border-radius: 5px; 
+        }
+        .test-button { 
+            padding: 10px 15px; 
+            margin: 5px; 
+            background: #4CAF50; 
+            color: white; 
+            border: none; 
+            cursor: pointer; 
+            border-radius: 5px;
+            display: inline-block;
+        }
+        .test-button:hover { background: #45a049; }
+        .result { 
+            margin-top: 15px; 
+            padding: 15px; 
+            background: #f9f9f9; 
+            border-radius: 5px; 
+            font-family: monospace;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        h2 { color: #333; margin-top: 30px; }
+        h3 { color: #666; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Admin Dashboard Sidebar Navigation Test</h1>
+
+    <div class="test-section">
+        <h2>Current Navigation Structure</h2>
+        <p><strong>How it works:</strong></p>
+        <ul>
+            <li>✅ <strong>Sidebar navigation:</strong> Each menu item has <code>onclick="showAdminTab('tabname')"</code></li>
+            <li>✅ <strong>Tab content pages:</strong> Each has ID <code>admin-{tabname}-tab</code> with class <code>admin-tab-content</code></li>
+            <li>✅ <strong>JavaScript function:</strong> <code>showAdminTab()</code> handles navigation</li>
+            <li>✅ <strong>Breadcrumb update:</strong> Shows current section name</li>
+            <li>✅ <strong>Data loading:</strong> Calls <code>loadAdminTabData()</code> for each tab</li>
+        </ul>
+
+        <h3>Available Admin Pages:</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 15px 0;">
+            <button class="test-button" onclick="testNavigation('dashboard')">📊 Dashboard</button>
+            <button class="test-button" onclick="testNavigation('analytics')">📈 Analytics</button>
+            <button class="test-button" onclick="testNavigation('users')">👥 Users</button>
+            <button class="test-button" onclick="testNavigation('rides')">🚗 Rides</button>
+            <button class="test-button" onclick="testNavigation('verification')">📄 Verification</button>
+            <button class="test-button" onclick="testNavigation('payments')">💳 Payments</button>
+            <button class="test-button" onclick="testNavigation('safety')">🛡️ Safety</button>
+            <button class="test-button" onclick="testNavigation('support')">🎧 Support</button>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Connection Test Results</h2>
+        <button class="test-button" onclick="runFullTest()">🧪 Test All Navigation Links</button>
+        <div id="testResults" class="result">Click "Test All Navigation Links" to verify sidebar connections...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Live Demo</h2>
+        <button class="test-button" onclick="openAdminDemo()">🚀 Open Admin Dashboard</button>
+        <div id="demoInstructions" class="result">
+            <strong>To test sidebar navigation:</strong>
+            <ol>
+                <li>Click "Open Admin Dashboard" above</li>
+                <li>Click "Admin Login" button</li>
+                <li>Try clicking different menu items in the sidebar</li>
+                <li>Observe how content changes and breadcrumb updates</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function testNavigation(tabId) {
+            // Simulate checking if navigation works
+            const iframe = document.createElement('iframe');
+            iframe.src = 'index.html';
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+            
+            iframe.onload = function() {
+                try {
+                    const doc = iframe.contentDocument;
+                    
+                    // Check if navigation elements exist
+                    const navItem = doc.querySelector(`[data-tab="${tabId}"]`);
+                    const tabContent = doc.getElementById(`admin-${tabId}-tab`);
+                    const showAdminTabFunc = iframe.contentWindow.showAdminTab;
+                    
+                    let result = `<strong>Testing "${tabId}" navigation:</strong><br>`;
+                    
+                    if (navItem) {
+                        result += `✅ Sidebar menu item exists<br>`;
+                    } else {
+                        result += `❌ Sidebar menu item missing<br>`;
+                    }
+                    
+                    if (tabContent) {
+                        result += `✅ Tab content page exists<br>`;
+                    } else {
+                        result += `❌ Tab content page missing<br>`;
+                    }
+                    
+                    if (showAdminTabFunc) {
+                        result += `✅ showAdminTab() function exists<br>`;
+                    } else {
+                        result += `❌ showAdminTab() function missing<br>`;
+                    }
+                    
+                    const isConnected = navItem && tabContent && showAdminTabFunc;
+                    result += `<br><strong>Status: ${isConnected ? '✅ CONNECTED' : '❌ NOT CONNECTED'}</strong>`;
+                    
+                    document.getElementById('testResults').innerHTML = result;
+                    document.getElementById('testResults').className = isConnected ? 'result success' : 'result error';
+                    
+                } catch (e) {
+                    document.getElementById('testResults').innerHTML = `❌ Error testing: ${e.message}`;
+                    document.getElementById('testResults').className = 'result error';
+                }
+                
+                document.body.removeChild(iframe);
+            };
+        }
+
+        function runFullTest() {
+            const tabs = ['dashboard', 'analytics', 'users', 'rides', 'verification', 'payments', 'safety', 'support'];
+            let results = '<strong>🔍 Full Navigation Test Results:</strong><br><br>';
+            let passCount = 0;
+            
+            const iframe = document.createElement('iframe');
+            iframe.src = 'index.html';
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+            
+            iframe.onload = function() {
+                try {
+                    const doc = iframe.contentDocument;
+                    const showAdminTabFunc = iframe.contentWindow.showAdminTab;
+                    
+                    tabs.forEach(tabId => {
+                        const navItem = doc.querySelector(`[data-tab="${tabId}"]`);
+                        const tabContent = doc.getElementById(`admin-${tabId}-tab`);
+                        const isConnected = navItem && tabContent && showAdminTabFunc;
+                        
+                        if (isConnected) passCount++;
+                        
+                        results += `<strong>${tabId}:</strong> ${isConnected ? '✅ Connected' : '❌ Missing components'}<br>`;
+                    });
+                    
+                    results += `<br><strong>Summary: ${passCount}/${tabs.length} pages properly connected</strong>`;
+                    
+                    document.getElementById('testResults').innerHTML = results;
+                    document.getElementById('testResults').className = passCount === tabs.length ? 'result success' : 'result error';
+                    
+                } catch (e) {
+                    document.getElementById('testResults').innerHTML = `❌ Error during full test: ${e.message}`;
+                    document.getElementById('testResults').className = 'result error';
+                }
+                
+                document.body.removeChild(iframe);
+            };
+        }
+
+        function openAdminDemo() {
+            window.open('index.html', '_blank', 'width=1200,height=800');
+            
+            document.getElementById('demoInstructions').innerHTML = `
+                <strong>✅ Admin Dashboard opened in new window!</strong><br><br>
+                <strong>Navigation Test Steps:</strong>
+                <ol>
+                    <li>🔐 Click "Admin Login" button</li>
+                    <li>📋 Try clicking different sidebar menu items</li>
+                    <li>👀 Watch how content changes</li>
+                    <li>🔄 Notice breadcrumb updates</li>
+                    <li>❌ Test the sidebar close button</li>
+                </ol>
+                <p><em>Each menu item should load different content and update the breadcrumb navigation.</em></p>
+            `;
+            document.getElementById('demoInstructions').className = 'result success';
+        }
+    </script>
+</body>
+</html>

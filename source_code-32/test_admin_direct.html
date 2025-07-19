@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direct Admin Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .error { color: #dc3545; background: #f8d7da; padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .success { color: #28a745; background: #d4edda; padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .warning { color: #856404; background: #fff3cd; padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .info { color: #004085; background: #cce7ff; padding: 10px; margin: 10px 0; border-radius: 4px; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin: 5px; }
+        button:hover { background: #0056b3; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; white-space: pre-wrap; }
+        iframe { width: 100%; height: 600px; border: 1px solid #ddd; border-radius: 4px; margin-top: 10px; }
+        .controls { margin: 10px 0; }
+        .step { margin: 10px 0; padding: 10px; border-left: 4px solid #007bff; background: #f8f9fa; }
+        .code-block { background: #f1f1f1; padding: 10px; border-radius: 4px; margin: 10px 0; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔧 Direct Admin Dashboard Diagnostic</h1>
+        <p>This test bypasses the normal login flow and directly accesses the admin dashboard to identify issues.</p>
+        
+        <div class="controls">
+            <button onclick="loadApp()">1. Load App</button>
+            <button onclick="directAccess()">2. Direct Dashboard Access</button>
+            <button onclick="testLogin()">3. Test Login Process</button>
+            <button onclick="checkElements()">4. Check DOM Elements</button>
+            <button onclick="testSupabase()">5. Test Supabase Connection</button>
+            <button onclick="runFullDiagnostic()">🚀 Run Full Diagnostic</button>
+        </div>
+        
+        <div id="results"></div>
+        <div id="console-output" style="background: #f8f9fa; padding: 10px; border-radius: 4px; margin: 10px 0; max-height: 300px; overflow-y: auto; font-family: monospace; white-space: pre-wrap;"></div>
+        
+        <iframe id="app-frame" src="about:blank"></iframe>
+    </div>
+
+    <script>
+        let appWindow = null;
+        let logs = [];
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            logs.push(logEntry);
+            
+            const output = document.getElementById('console-output');
+            output.textContent = logs.join('\n');
+            output.scrollTop = output.scrollHeight;
+            
+            console.log(logEntry);
+        }
+        
+        function showResult(html, type = 'info') {
+            const results = document.getElementById('results');
+            results.innerHTML += `<div class="${type}">${html}</div>`;
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+            logs = [];
+            document.getElementById('console-output').textContent = '';
+        }
+        
+        function loadApp() {
+            clearResults();
+            log('Loading application...');
+            
+            const frame = document.getElementById('app-frame');
+            frame.src = './index.html';
+            
+            frame.onload = function() {
+                try {
+                    appWindow = frame.contentWindow;
+                    log('✅ App loaded successfully');
+                    showResult('✅ Application loaded successfully', 'success');
+                    
+                    // Capture console messages
+                    if (appWindow.console) {
+                        const originalLog = appWindow.console.log;
+                        const originalError = appWindow.console.error;
+                        const originalWarn = appWindow.console.warn;
+                        
+                        appWindow.console.log = function(...args) {
+                            log('APP LOG: ' + args.join(' '));
+                            originalLog.apply(appWindow.console, args);
+                        };
+                        
+                        appWindow.console.error = function(...args) {
+                            log('APP ERROR: ' + args.join(' '));
+                            originalError.apply(appWindow.console, args);
+                        };
+                        
+                        appWindow.console.warn = function(...args) {
+                            log('APP WARN: ' + args.join(' '));
+                            originalWarn.apply(appWindow.console, args);
+                        };
+                    }
+                    
+                } catch (error) {
+                    log('❌ Error accessing app window: ' + error.message);
+                    showResult('❌ Error accessing app: ' + error.message, 'error');
+                }
+            };
+            
+            frame.onerror = function(error) {
+                log('❌ Frame error: ' + error);
+                showResult('❌ Frame error: ' + error, 'error');
+            };
+        }
+        
+        function directAccess() {
+            if (!appWindow) {
+                showResult('❌ App not loaded. Click "Load App" first.', 'error');
+                return;
+            }
+            
+            log('Attempting direct admin dashboard access...');
+            
+            try {
+                // Try to show admin dashboard directly
+                const dashboard = appWindow.document.getElementById('admin-dashboard');
+                if (!dashboard) {
+                    log('❌ Admin dashboard element not found');
+                    showResult('❌ Admin dashboard element (#admin-dashboard) not found in DOM', 'error');
+                    return;
+                }
+                
+                log('✅ Admin dashboard element found');
+                
+                // Check current display state
+                const currentDisplay = dashboard.style.display;
+                log('Current display state: ' + currentDisplay);
+                
+                // Try to show it directly
+                dashboard.style.display = 'block';
+                log('Set display to block');
+                
+                // Initialize dashboard
+                if (typeof appWindow.initializeAdminDashboard === 'function') {
+                    appWindow.initializeAdminDashboard();
+                    log('✅ Called initializeAdminDashboard()');
+                    showResult('✅ Dashboard initialized successfully', 'success');
+                } else {
+                    log('❌ initializeAdminDashboard function not found');
+                    showResult('❌ initializeAdminDashboard function not found', 'error');
+                }
+                
+                // Check if it's visible now
+                setTimeout(() => {
+                    const isVisible = dashboard.style.display !== 'none';
+                    const hasContent = dashboard.innerHTML.trim().length > 0;
+                    
+                    log('Dashboard visible: ' + isVisible);
+                    log('Dashboard has content: ' + hasContent);
+                    
+                    if (isVisible && hasContent) {
+                        showResult('✅ Dashboard is now visible and has content', 'success');
+                    } else if (isVisible && !hasContent) {
+                        showResult('⚠️ Dashboard is visible but empty', 'warning');
+                    } else {
+                        showResult('❌ Dashboard is still not visible', 'error');
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                log('❌ Error in direct access: ' + error.message);
+                showResult('❌ Error in direct access: ' + error.message, 'error');
+            }
+        }
+        
+        function testLogin() {
+            if (!appWindow) {
+                showResult('❌ App not loaded. Click "Load App" first.', 'error');
+                return;
+            }
+            
+            log('Testing login process...');
+            
+            try {
+                // Show admin login page
+                if (typeof appWindow.showPage === 'function') {
+                    appWindow.showPage('admin-login-page');
+                    log('✅ Admin login page shown');
+                } else {
+                    log('❌ showPage function not found');
+                    showResult('❌ showPage function not found', 'error');
+                    return;
+                }
+                
+                setTimeout(() => {
+                    // Fill in credentials
+                    const emailField = appWindow.document.getElementById('admin-email');
+                    const passwordField = appWindow.document.getElementById('admin-password');
+                    
+                    if (!emailField || !passwordField) {
+                        log('❌ Login form fields not found');
+                        showResult('❌ Admin login form fields not found', 'error');
+                        return;
+                    }
+                    
+                    emailField.value = 'admin@ongopool.com';
+                    passwordField.value = 'admin123';
+                    log('✅ Credentials entered');
+                    
+                    // Try to submit
+                    if (typeof appWindow.adminLogin === 'function') {
+                        const fakeEvent = { preventDefault: () => {} };
+                        appWindow.adminLogin(fakeEvent);
+                        log('✅ adminLogin function called');
+                        
+                        setTimeout(() => {
+                            const dashboard = appWindow.document.getElementById('admin-dashboard');
+                            const isVisible = dashboard && dashboard.style.display !== 'none';
+                            
+                            if (isVisible) {
+                                showResult('✅ Login successful - Dashboard visible', 'success');
+                            } else {
+                                showResult('❌ Login failed - Dashboard not visible', 'error');
+                            }
+                        }, 2000);
+                        
+                    } else {
+                        log('❌ adminLogin function not found');
+                        showResult('❌ adminLogin function not found', 'error');
+                    }
+                }, 500);
+                
+            } catch (error) {
+                log('❌ Error in login test: ' + error.message);
+                showResult('❌ Error in login test: ' + error.message, 'error');
+            }
+        }
+        
+        function checkElements() {
+            if (!appWindow) {
+                showResult('❌ App not loaded. Click "Load App" first.', 'error');
+                return;
+            }
+            
+            log('Checking DOM elements...');
+            
+            const elements = [
+                'admin-dashboard',
+                'admin-login-page',
+                'main-app',
+                'start-page'
+            ];
+            
+            let report = '<h3>DOM Element Check:</h3><ul>';
+            
+            elements.forEach(id => {
+                const element = appWindow.document.getElementById(id);
+                if (element) {
+                    const display = element.style.display;
+                    const hasContent = element.innerHTML.trim().length > 0;
+                    report += `<li>✅ #${id} - Display: ${display || 'default'}, Has Content: ${hasContent}</li>`;
+                    log(`✅ Found #${id} - Display: ${display || 'default'}`);
+                } else {
+                    report += `<li>❌ #${id} - Not found</li>`;
+                    log(`❌ Missing #${id}`);
+                }
+            });
+            
+            report += '</ul>';
+            showResult(report, 'info');
+            
+            // Check key functions
+            const functions = [
+                'showPage',
+                'adminLogin',
+                'initializeAdminDashboard',
+                'updateDashboardStats',
+                'loadActivityFeed'
+            ];
+            
+            let funcReport = '<h3>Function Check:</h3><ul>';
+            
+            functions.forEach(funcName => {
+                if (typeof appWindow[funcName] === 'function') {
+                    funcReport += `<li>✅ ${funcName}() - Available</li>`;
+                    log(`✅ Function ${funcName} exists`);
+                } else {
+                    funcReport += `<li>❌ ${funcName}() - Missing</li>`;
+                    log(`❌ Function ${funcName} missing`);
+                }
+            });
+            
+            funcReport += '</ul>';
+            showResult(funcReport, 'info');
+        }
+        
+        function testSupabase() {
+            if (!appWindow) {
+                showResult('❌ App not loaded. Click "Load App" first.', 'error');
+                return;
+            }
+            
+            log('Testing Supabase connection...');
+            
+            try {
+                if (appWindow.supabase) {
+                    log('✅ Supabase object found');
+                    showResult('✅ Supabase client is available', 'success');
+                    
+                    // Test a simple query
+                    if (typeof appWindow.supabase.rpc === 'function') {
+                        log('Testing execute_sql function...');
+                        
+                        appWindow.supabase.rpc('execute_sql', { 
+                            query: 'SELECT COUNT(*) as count FROM users' 
+                        }).then(result => {
+                            if (result.error) {
+                                log('❌ Supabase query error: ' + result.error.message);
+                                showResult('❌ Supabase query failed: ' + result.error.message, 'error');
+                            } else {
+                                log('✅ Supabase query successful');
+                                showResult('✅ Supabase connection working - Query returned data', 'success');
+                            }
+                        }).catch(error => {
+                            log('❌ Supabase promise error: ' + error.message);
+                            showResult('❌ Supabase promise error: ' + error.message, 'error');
+                        });
+                    } else {
+                        log('❌ Supabase RPC method not found');
+                        showResult('❌ Supabase RPC method not available', 'error');
+                    }
+                } else {
+                    log('❌ Supabase object not found');
+                    showResult('❌ Supabase client not found - Database queries will fail', 'error');
+                }
+            } catch (error) {
+                log('❌ Error testing Supabase: ' + error.message);
+                showResult('❌ Error testing Supabase: ' + error.message, 'error');
+            }
+        }
+        
+        function runFullDiagnostic() {
+            clearResults();
+            log('🚀 Starting full diagnostic...');
+            showResult('<h2>🚀 Full Admin Dashboard Diagnostic</h2>', 'info');
+            
+            if (!appWindow) {
+                loadApp();
+                setTimeout(() => {
+                    runDiagnosticSteps();
+                }, 2000);
+            } else {
+                runDiagnosticSteps();
+            }
+        }
+        
+        function runDiagnosticSteps() {
+            setTimeout(() => checkElements(), 500);
+            setTimeout(() => testSupabase(), 1000);
+            setTimeout(() => directAccess(), 1500);
+            setTimeout(() => {
+                log('🏁 Full diagnostic complete');
+                showResult('<h3>🏁 Diagnostic Summary</h3><p>Check the results above for any issues found.</p>', 'info');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

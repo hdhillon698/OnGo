@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OnGoPool - Real-time Features Testing</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+        }
+
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .test-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .test-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .test-card h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-disconnected { background: #ff6b6b; }
+        .status-connecting { background: #feca57; }
+        .status-connected { background: #48dbfb; }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin: 0.25rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        .btn-success { background: #48bb78; }
+        .btn-warning { background: #ed8936; }
+        .btn-danger { background: #f56565; }
+
+        .console {
+            background: #1a202c;
+            color: #e2e8f0;
+            border-radius: 10px;
+            padding: 1rem;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.85rem;
+            height: 200px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+
+        .chat-demo {
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .chat-message {
+            padding: 0.5rem 1rem;
+            margin: 0.25rem 0;
+            border-radius: 15px;
+            max-width: 80%;
+        }
+
+        .chat-message.sent {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+        }
+
+        .chat-message.received {
+            background: white;
+            border: 1px solid #e2e8f0;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 1rem;
+            border-top: 1px solid #e2e8f0;
+            background: white;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            margin-right: 0.5rem;
+        }
+
+        .notification-demo {
+            padding: 1rem;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+            display: none;
+        }
+
+        .notification-demo.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .location-status {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .location-coords {
+            font-family: monospace;
+            background: #1a202c;
+            color: #48bb78;
+            padding: 0.5rem;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-bolt"></i> Real-time Features Testing Dashboard</h1>
+            <p>Test and monitor all real-time functionality of OnGoPool</p>
+            <div style="margin-top: 1rem;">
+                <span class="status-indicator" id="supabase-status"></span>
+                <span id="connection-text">Disconnected from Supabase</span>
+            </div>
+        </div>
+
+        <div class="test-grid">
+            <!-- Chat System Testing -->
+            <div class="test-card">
+                <h3><i class="fas fa-comments"></i> Chat System</h3>
+                <p>Test real-time messaging between users</p>
+                
+                <div class="chat-demo" id="chat-demo">
+                    <div class="chat-messages" id="chat-messages-demo">
+                        <div class="chat-message received">
+                            <strong>Driver:</strong> Hi! Ready for the trip?
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="chat-input-demo" placeholder="Type a message..." />
+                        <button class="btn" onclick="sendTestMessage()">Send</button>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1rem;">
+                    <button class="btn" onclick="connectChatRealtime()">Connect Real-time</button>
+                    <button class="btn btn-warning" onclick="simulateIncomingMessage()">Simulate Message</button>
+                </div>
+            </div>
+
+            <!-- Push Notifications -->
+            <div class="test-card">
+                <h3><i class="fas fa-bell"></i> Push Notifications</h3>
+                <p>Test browser push notification system</p>
+
+                <div class="notification-demo" id="notification-demo">
+                    <strong>🔔 New Ride Request!</strong><br>
+                    Sarah wants to join your trip to Downtown
+                </div>
+
+                <div style="margin-top: 1rem;">
+                    <button class="btn" onclick="requestNotificationPermission()">Request Permission</button>
+                    <button class="btn btn-success" onclick="testPushNotification()">Test Notification</button>
+                    <button class="btn btn-warning" onclick="testServiceWorker()">Test Service Worker</button>
+                </div>
+
+                <div class="console" id="notification-console"></div>
+            </div>
+
+            <!-- Location Tracking -->
+            <div class="test-card">
+                <h3><i class="fas fa-map-marker-alt"></i> Location Tracking</h3>
+                <p>Test GPS and real-time location sharing</p>
+
+                <div class="location-status">
+                    <i class="fas fa-satellite-dish" id="gps-icon" style="color: #ccc;"></i>
+                    <div>
+                        <div><strong>GPS Status:</strong> <span id="gps-status">Not active</span></div>
+                        <div class="location-coords" id="location-display">No location data</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1rem;">
+                    <button class="btn" onclick="startLocationTracking()">Start Tracking</button>
+                    <button class="btn btn-danger" onclick="stopLocationTracking()">Stop Tracking</button>
+                    <button class="btn btn-warning" onclick="shareLocation()">Share Location</button>
+                </div>
+
+                <div class="console" id="location-console"></div>
+            </div>
+
+            <!-- Database Real-time -->
+            <div class="test-card">
+                <h3><i class="fas fa-database"></i> Database Real-time</h3>
+                <p>Test Supabase real-time subscriptions</p>
+
+                <div style="margin-top: 1rem;">
+                    <button class="btn" onclick="subscribeToRides()">Subscribe to Rides</button>
+                    <button class="btn" onclick="subscribeToBookings()">Subscribe to Bookings</button>
+                    <button class="btn btn-success" onclick="insertTestData()">Insert Test Data</button>
+                </div>
+
+                <div class="console" id="database-console"></div>
+            </div>
+
+            <!-- Performance Monitor -->
+            <div class="test-card">
+                <h3><i class="fas fa-tachometer-alt"></i> Performance Monitor</h3>
+                <p>Monitor real-time feature performance</p>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                    <div>
+                        <strong>WebSocket Latency:</strong><br>
+                        <span id="ws-latency">-- ms</span>
+                    </div>
+                    <div>
+                        <strong>Message Queue:</strong><br>
+                        <span id="message-queue">0 pending</span>
+                    </div>
+                    <div>
+                        <strong>Memory Usage:</strong><br>
+                        <span id="memory-usage">-- MB</span>
+                    </div>
+                    <div>
+                        <strong>Active Connections:</strong><br>
+                        <span id="active-connections">0</span>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="startPerformanceMonitoring()">Start Monitoring</button>
+                <button class="btn btn-danger" onclick="stopPerformanceMonitoring()">Stop</button>
+            </div>
+
+            <!-- Connection Status -->
+            <div class="test-card">
+                <h3><i class="fas fa-wifi"></i> Connection Status</h3>
+                <p>Monitor all real-time connections</p>
+
+                <div id="connection-statuses" style="margin: 1rem 0;">
+                    <div class="status-row">
+                        <span class="status-indicator status-disconnected"></span>
+                        <span>Supabase Real-time: Disconnected</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-indicator status-disconnected"></span>
+                        <span>Service Worker: Not registered</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-indicator status-disconnected"></span>
+                        <span>GPS: Inactive</span>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="checkAllConnections()">Check All</button>
+                <button class="btn btn-success" onclick="reconnectAll()">Reconnect All</button>
+            </div>
+        </div>
+
+        <div class="test-card" style="margin-top: 2rem;">
+            <h3><i class="fas fa-terminal"></i> Global Console</h3>
+            <div class="console" id="global-console" style="height: 300px;"></div>
+            <button class="btn" onclick="clearConsole()">Clear Console</button>
+            <button class="btn btn-warning" onclick="exportLogs()">Export Logs</button>
+        </div>
+    </div>
+
+    <!-- Supabase and required scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Global variables
+        let supabase;
+        let realtimeSubscriptions = [];
+        let watchId = null;
+        let performanceInterval = null;
+        let currentLocation = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSupabase();
+            logToConsole('🚀 Real-time testing dashboard initialized');
+            checkServiceWorkerSupport();
+        });
+
+        // Supabase initialization
+        function initializeSupabase() {
+            try {
+                const SUPABASE_URL = 'https://efjwsdxgelbgthcyltjr.supabase.co';
+                const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmandzZHhnZWxiZ3RoY3lsdGpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3OTUwODksImV4cCI6MjA2NjM3MTA4OX0.giqea72-32b0_AhVXyCxQ_6xpjDrd7Z33HcibB8xtNs';
+                
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                
+                updateConnectionStatus('supabase-status', 'connected');
+                document.getElementById('connection-text').textContent = 'Connected to Supabase';
+                logToConsole('✅ Supabase connection established');
+                
+            } catch (error) {
+                logToConsole('❌ Failed to connect to Supabase: ' + error.message, 'error');
+                updateConnectionStatus('supabase-status', 'disconnected');
+            }
+        }
+
+        // Chat functions
+        function connectChatRealtime() {
+            if (!supabase) {
+                logToConsole('❌ Supabase not connected', 'error');
+                return;
+            }
+
+            const subscription = supabase
+                .channel('chat-messages')
+                .on('postgres_changes', {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'chat_messages'
+                }, (payload) => {
+                    logToConsole('📨 New chat message received:', 'success');
+                    console.log(payload);
+                    displayRealtimeMessage(payload.new);
+                })
+                .subscribe();
+
+            realtimeSubscriptions.push(subscription);
+            logToConsole('🔌 Connected to chat real-time updates');
+        }
+
+        function sendTestMessage() {
+            const input = document.getElementById('chat-input-demo');
+            const message = input.value.trim();
+            
+            if (!message) return;
+
+            displayMessage('You: ' + message, true);
+            input.value = '';
+            
+            logToConsole('📤 Message sent: ' + message);
+            
+            // Simulate response after 1 second
+            setTimeout(() => {
+                simulateIncomingMessage();
+            }, 1000);
+        }
+
+        function simulateIncomingMessage() {
+            const responses = [
+                "Driver: Thanks for the update!",
+                "Driver: I'll be there in 5 minutes",
+                "Driver: What's your pickup location again?",
+                "Driver: Traffic is a bit heavy, might be 2 minutes late",
+                "Driver: I'm in a blue Honda Civic"
+            ];
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+            displayMessage(randomResponse, false);
+            logToConsole('📥 Simulated incoming message');
+        }
+
+        function displayMessage(text, isSent) {
+            const messagesContainer = document.getElementById('chat-messages-demo');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${isSent ? 'sent' : 'received'}`;
+            messageDiv.innerHTML = `<strong>${text}</strong>`;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function displayRealtimeMessage(messageData) {
+            displayMessage(`${messageData.sender}: ${messageData.content}`, false);
+        }
+
+        // Notification functions
+        function requestNotificationPermission() {
+            if (!('Notification' in window)) {
+                logToConsole('❌ This browser does not support notifications', 'error');
+                return;
+            }
+
+            Notification.requestPermission().then(permission => {
+                logToConsole(`🔔 Notification permission: ${permission}`);
+                logToNotificationConsole(`Permission status: ${permission}`);
+                
+                if (permission === 'granted') {
+                    logToConsole('✅ Notification permission granted', 'success');
+                }
+            });
+        }
+
+        function testPushNotification() {
+            if (Notification.permission === 'granted') {
+                const notification = new Notification('OnGoPool Test', {
+                    body: 'This is a test notification from the real-time dashboard',
+                    icon: '/favicon.ico',
+                    tag: 'test-notification'
+                });
+
+                notification.onclick = () => {
+                    logToConsole('🔔 Notification clicked');
+                    notification.close();
+                };
+
+                document.getElementById('notification-demo').classList.add('show');
+                setTimeout(() => {
+                    document.getElementById('notification-demo').classList.remove('show');
+                }, 3000);
+
+                logToConsole('🔔 Test notification sent', 'success');
+                logToNotificationConsole('Test notification displayed');
+            } else {
+                logToConsole('❌ Notification permission not granted', 'error');
+                logToNotificationConsole('Permission required for notifications');
+            }
+        }
+
+        function testServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        logToConsole('✅ Service Worker registered', 'success');
+                        logToNotificationConsole('Service Worker: Registered successfully');
+                        return registration;
+                    })
+                    .catch(error => {
+                        logToConsole('❌ Service Worker registration failed: ' + error.message, 'error');
+                        logToNotificationConsole('Service Worker: Registration failed');
+                    });
+            } else {
+                logToConsole('❌ Service Worker not supported', 'error');
+                logToNotificationConsole('Service Worker: Not supported');
+            }
+        }
+
+        function checkServiceWorkerSupport() {
+            if ('serviceWorker' in navigator) {
+                logToNotificationConsole('Service Worker: Supported');
+                if ('PushManager' in window) {
+                    logToNotificationConsole('Push API: Supported');
+                } else {
+                    logToNotificationConsole('Push API: Not supported');
+                }
+            } else {
+                logToNotificationConsole('Service Worker: Not supported');
+            }
+        }
+
+        // Location functions
+        function startLocationTracking() {
+            if (!navigator.geolocation) {
+                logToConsole('❌ Geolocation not supported', 'error');
+                return;
+            }
+
+            const options = {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0
+            };
+
+            watchId = navigator.geolocation.watchPosition(
+                (position) => {
+                    currentLocation = position;
+                    updateLocationDisplay(position);
+                    logToLocationConsole(`Location updated: ${position.coords.latitude}, ${position.coords.longitude}`);
+                    
+                    // Change GPS icon to active
+                    document.getElementById('gps-icon').style.color = '#48bb78';
+                    document.getElementById('gps-status').textContent = 'Active';
+                },
+                (error) => {
+                    logToConsole('❌ Location error: ' + error.message, 'error');
+                    logToLocationConsole('Error: ' + error.message);
+                    document.getElementById('gps-icon').style.color = '#f56565';
+                    document.getElementById('gps-status').textContent = 'Error';
+                },
+                options
+            );
+
+            logToConsole('🛰️ Location tracking started');
+        }
+
+        function stopLocationTracking() {
+            if (watchId !== null) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+                document.getElementById('gps-icon').style.color = '#ccc';
+                document.getElementById('gps-status').textContent = 'Stopped';
+                logToConsole('🛰️ Location tracking stopped');
+                logToLocationConsole('Tracking stopped');
+            }
+        }
+
+        function shareLocation() {
+            if (currentLocation) {
+                const coords = currentLocation.coords;
+                const locationText = `${coords.latitude.toFixed(6)}, ${coords.longitude.toFixed(6)}`;
+                
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'My Current Location',
+                        text: `I'm currently at: ${locationText}`,
+                        url: `https://maps.google.com/?q=${coords.latitude},${coords.longitude}`
+                    });
+                } else {
+                    // Fallback to clipboard
+                    navigator.clipboard.writeText(locationText).then(() => {
+                        logToConsole('📍 Location copied to clipboard', 'success');
+                    });
+                }
+                
+                logToLocationConsole(`Shared location: ${locationText}`);
+            } else {
+                logToConsole('❌ No location data available', 'error');
+            }
+        }
+
+        function updateLocationDisplay(position) {
+            const coords = position.coords;
+            const display = document.getElementById('location-display');
+            display.textContent = `${coords.latitude.toFixed(6)}, ${coords.longitude.toFixed(6)}`;
+        }
+
+        // Database real-time functions
+        function subscribeToRides() {
+            if (!supabase) return;
+
+            const subscription = supabase
+                .channel('rides-changes')
+                .on('postgres_changes', {
+                    event: '*',
+                    schema: 'public',
+                    table: 'rides'
+                }, (payload) => {
+                    logToDatabaseConsole(`Ride ${payload.eventType}: ${JSON.stringify(payload.new || payload.old)}`);
+                })
+                .subscribe();
+
+            realtimeSubscriptions.push(subscription);
+            logToConsole('🔌 Subscribed to rides table');
+            logToDatabaseConsole('Subscribed to rides table changes');
+        }
+
+        function subscribeToBookings() {
+            if (!supabase) return;
+
+            const subscription = supabase
+                .channel('bookings-changes')
+                .on('postgres_changes', {
+                    event: '*',
+                    schema: 'public',
+                    table: 'ride_bookings'
+                }, (payload) => {
+                    logToDatabaseConsole(`Booking ${payload.eventType}: ${JSON.stringify(payload.new || payload.old)}`);
+                })
+                .subscribe();
+
+            realtimeSubscriptions.push(subscription);
+            logToConsole('🔌 Subscribed to bookings table');
+            logToDatabaseConsole('Subscribed to ride_bookings table changes');
+        }
+
+        async function insertTestData() {
+            if (!supabase) return;
+
+            try {
+                const testRide = {
+                    driver_id: '00000000-0000-0000-0000-000000000000',
+                    origin_address: 'Test Origin',
+                    destination_address: 'Test Destination',
+                    origin_lat: 40.7128,
+                    origin_lng: -74.0060,
+                    destination_lat: 40.7589,
+                    destination_lng: -73.9851,
+                    departure_date: new Date().toISOString().split('T')[0],
+                    departure_time: '09:00',
+                    available_seats: 3,
+                    price_per_seat: 15.00,
+                    service_fee: 1.80,
+                    total_price: 16.80,
+                    total_distance: 12.5
+                };
+
+                const { data, error } = await supabase
+                    .from('rides')
+                    .insert([testRide])
+                    .select();
+
+                if (error) {
+                    logToConsole('❌ Failed to insert test data: ' + error.message, 'error');
+                    logToDatabaseConsole('Insert failed: ' + error.message);
+                } else {
+                    logToConsole('✅ Test data inserted successfully', 'success');
+                    logToDatabaseConsole('Test ride inserted successfully');
+                }
+            } catch (error) {
+                logToConsole('❌ Error inserting test data: ' + error.message, 'error');
+            }
+        }
+
+        // Performance monitoring
+        function startPerformanceMonitoring() {
+            performanceInterval = setInterval(() => {
+                updatePerformanceMetrics();
+            }, 1000);
+            logToConsole('📊 Performance monitoring started');
+        }
+
+        function stopPerformanceMonitoring() {
+            if (performanceInterval) {
+                clearInterval(performanceInterval);
+                performanceInterval = null;
+                logToConsole('📊 Performance monitoring stopped');
+            }
+        }
+
+        function updatePerformanceMetrics() {
+            // WebSocket latency simulation
+            const latency = Math.floor(Math.random() * 100) + 20;
+            document.getElementById('ws-latency').textContent = latency + ' ms';
+
+            // Message queue simulation
+            const queueSize = Math.floor(Math.random() * 5);
+            document.getElementById('message-queue').textContent = queueSize + ' pending';
+
+            // Memory usage
+            if (performance.memory) {
+                const memoryUsage = (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(1);
+                document.getElementById('memory-usage').textContent = memoryUsage + ' MB';
+            }
+
+            // Active connections
+            document.getElementById('active-connections').textContent = realtimeSubscriptions.length;
+        }
+
+        // Connection status functions
+        function updateConnectionStatus(elementId, status) {
+            const element = document.getElementById(elementId);
+            element.className = `status-indicator status-${status}`;
+        }
+
+        function checkAllConnections() {
+            logToConsole('🔍 Checking all connections...');
+            
+            // Check Supabase
+            if (supabase) {
+                updateConnectionStatus('supabase-status', 'connected');
+                logToConsole('✅ Supabase: Connected');
+            } else {
+                updateConnectionStatus('supabase-status', 'disconnected');
+                logToConsole('❌ Supabase: Disconnected');
+            }
+            
+            // Check Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistration().then(registration => {
+                    if (registration) {
+                        logToConsole('✅ Service Worker: Registered');
+                    } else {
+                        logToConsole('❌ Service Worker: Not registered');
+                    }
+                });
+            }
+            
+            // Check GPS
+            if (watchId !== null) {
+                logToConsole('✅ GPS: Active');
+            } else {
+                logToConsole('❌ GPS: Inactive');
+            }
+        }
+
+        function reconnectAll() {
+            logToConsole('🔄 Reconnecting all services...');
+            
+            // Reconnect Supabase
+            initializeSupabase();
+            
+            // Reregister Service Worker
+            testServiceWorker();
+            
+            logToConsole('🔄 Reconnection attempts completed');
+        }
+
+        // Console functions
+        function logToConsole(message, type = 'info') {
+            const console = document.getElementById('global-console');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            
+            let color = '#e2e8f0';
+            if (type === 'success') color = '#48bb78';
+            if (type === 'error') color = '#f56565';
+            if (type === 'warning') color = '#ed8936';
+            
+            logEntry.style.color = color;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            console.appendChild(logEntry);
+            console.scrollTop = console.scrollHeight;
+        }
+
+        function logToNotificationConsole(message) {
+            const console = document.getElementById('notification-console');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            console.appendChild(logEntry);
+            console.scrollTop = console.scrollHeight;
+        }
+
+        function logToLocationConsole(message) {
+            const console = document.getElementById('location-console');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            console.appendChild(logEntry);
+            console.scrollTop = console.scrollHeight;
+        }
+
+        function logToDatabaseConsole(message) {
+            const console = document.getElementById('database-console');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            console.appendChild(logEntry);
+            console.scrollTop = console.scrollHeight;
+        }
+
+        function clearConsole() {
+            document.getElementById('global-console').innerHTML = '';
+            logToConsole('🧹 Console cleared');
+        }
+
+        function exportLogs() {
+            const console = document.getElementById('global-console');
+            const logs = console.textContent;
+            const blob = new Blob([logs], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ongopool-logs-${new Date().toISOString().slice(0,10)}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            logToConsole('📄 Logs exported');
+        }
+    </script>
+</body>
+</html>

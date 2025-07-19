@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Layout Fix Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            background: #f5f5f5;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .info { color: #007bff; }
+        .test-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Layout Fix Test - Admin Dashboard & Earnings</h1>
+    
+    <div class="test-section">
+        <h2>📋 Problem Description</h2>
+        <p><strong>Issue:</strong> When opening admin dashboard or earnings page, content appears blank initially and user needs to scroll up to see proper content.</p>
+        <p><strong>Diagnosis:</strong> Content positioning issue - elements were being rendered below the viewport.</p>
+    </div>
+
+    <div class="test-section">
+        <h2>🛠️ Applied Fixes</h2>
+        <ul>
+            <li>✅ <strong>Admin Dashboard:</strong> Added <code>position: fixed; top: 0; left: 0;</code></li>
+            <li>✅ <strong>Admin Content:</strong> Set <code>height: calc(100vh - 80px); position: relative;</code></li>
+            <li>✅ <strong>Tab Content:</strong> Removed top margin, added <code>padding-top: 0.5rem;</code></li>
+            <li>✅ <strong>Earnings Card:</strong> Added <code>margin-top: 0; padding-top: 1rem;</code></li>
+            <li>✅ <strong>Admin Container:</strong> Added <code>position: relative; width: 100%;</code></li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>🧪 Test Functions</h2>
+        <button class="test-btn" onclick="testAdminDashboard()">Test Admin Dashboard</button>
+        <button class="test-btn" onclick="testEarningsPage()">Test Earnings Page</button>
+        <button class="test-btn" onclick="testBothPages()">Test Both Pages</button>
+        
+        <div id="test-results" style="margin-top: 20px; min-height: 100px; border: 1px solid #ddd; padding: 10px; background: white;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📝 Expected Results</h2>
+        <ul>
+            <li><strong>Admin Dashboard:</strong> Should display immediately at top of viewport</li>
+            <li><strong>Earnings Page:</strong> Content should be visible without scrolling</li>
+            <li><strong>Navigation:</strong> Smooth transitions between sections</li>
+            <li><strong>No Blank Pages:</strong> Content appears instantly</li>
+        </ul>
+    </div>
+
+    <script>
+        function log(message) {
+            const results = document.getElementById('test-results');
+            results.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${message}</div>`;
+            results.scrollTop = results.scrollHeight;
+        }
+
+        function testAdminDashboard() {
+            log('🔍 Testing Admin Dashboard...');
+            
+            // Open admin dashboard in new window
+            const adminWindow = window.open('index.html', '_blank');
+            
+            adminWindow.onload = function() {
+                try {
+                    // Wait a moment for page to render
+                    setTimeout(() => {
+                        // Check if admin dashboard functions exist
+                        if (typeof adminWindow.showPage === 'function') {
+                            log('✅ Admin functions found');
+                            
+                            // Simulate admin login
+                            adminWindow.showPage('admin-login-page');
+                            log('✅ Admin login page shown');
+                            
+                            setTimeout(() => {
+                                // Try to show admin dashboard
+                                if (typeof adminWindow.showAdminDashboard === 'function') {
+                                    adminWindow.showAdminDashboard();
+                                    log('✅ Admin dashboard activated');
+                                } else {
+                                    log('⚠️ showAdminDashboard function not found, trying alternative');
+                                    // Try alternative method
+                                    const adminDashboard = adminWindow.document.getElementById('admin-dashboard');
+                                    if (adminDashboard) {
+                                        adminDashboard.style.display = 'block';
+                                        log('✅ Admin dashboard shown via DOM manipulation');
+                                    }
+                                }
+                                
+                                // Check positioning
+                                setTimeout(() => {
+                                    const dashboard = adminWindow.document.getElementById('admin-dashboard');
+                                    if (dashboard) {
+                                        const rect = dashboard.getBoundingClientRect();
+                                        const styles = adminWindow.getComputedStyle(dashboard);
+                                        
+                                        log(`📊 Dashboard position: top=${rect.top}px, left=${rect.left}px`);
+                                        log(`📊 Dashboard styles: position=${styles.position}, top=${styles.top}`);
+                                        
+                                        if (rect.top <= 0 && styles.position === 'fixed') {
+                                            log('✅ Dashboard properly positioned at viewport top');
+                                        } else {
+                                            log('❌ Dashboard positioning issue detected');
+                                        }
+                                    }
+                                }, 500);
+                                
+                            }, 1000);
+                        } else {
+                            log('❌ Admin functions not found');
+                        }
+                    }, 500);
+                } catch (error) {
+                    log(`❌ Error testing admin dashboard: ${error.message}`);
+                }
+            };
+        }
+
+        function testEarningsPage() {
+            log('🔍 Testing Earnings Page...');
+            
+            // Open main page and navigate to earnings
+            const mainWindow = window.open('index.html', '_blank');
+            
+            mainWindow.onload = function() {
+                try {
+                    setTimeout(() => {
+                        // Check if switchTab function exists
+                        if (typeof mainWindow.switchTab === 'function') {
+                            log('✅ Tab switching functions found');
+                            
+                            // Switch to earnings tab
+                            mainWindow.switchTab('earnings');
+                            log('✅ Switched to earnings tab');
+                            
+                            setTimeout(() => {
+                                const earningsTab = mainWindow.document.getElementById('earnings');
+                                if (earningsTab) {
+                                    const rect = earningsTab.getBoundingClientRect();
+                                    const styles = mainWindow.getComputedStyle(earningsTab);
+                                    
+                                    log(`📊 Earnings tab position: top=${rect.top}px`);
+                                    log(`📊 Earnings tab styles: margin-top=${styles.marginTop}, padding-top=${styles.paddingTop}`);
+                                    
+                                    if (rect.top >= 0 && rect.top < 200) {
+                                        log('✅ Earnings page properly positioned in viewport');
+                                    } else {
+                                        log('❌ Earnings page positioning issue detected');
+                                    }
+                                    
+                                    // Check if content is visible
+                                    const earningsCard = earningsTab.querySelector('.card');
+                                    if (earningsCard) {
+                                        const cardRect = earningsCard.getBoundingClientRect();
+                                        if (cardRect.top >= 0) {
+                                            log('✅ Earnings content visible without scrolling');
+                                        } else {
+                                            log('❌ Earnings content requires scrolling to view');
+                                        }
+                                    }
+                                }
+                            }, 500);
+                        } else {
+                            log('❌ Tab switching functions not found');
+                        }
+                    }, 500);
+                } catch (error) {
+                    log(`❌ Error testing earnings page: ${error.message}`);
+                }
+            };
+        }
+
+        function testBothPages() {
+            log('🔍 Running comprehensive test...');
+            log('--- Testing Admin Dashboard ---');
+            testAdminDashboard();
+            
+            setTimeout(() => {
+                log('--- Testing Earnings Page ---');
+                testEarningsPage();
+                
+                setTimeout(() => {
+                    log('--- Test Summary ---');
+                    log('✅ Layout fix testing completed');
+                    log('📋 Check results above for any issues');
+                }, 3000);
+            }, 2000);
+        }
+
+        // Auto-run basic test
+        window.onload = function() {
+            log('🚀 Layout Fix Test initialized');
+            log('📋 Click buttons above to test specific pages');
+        };
+    </script>
+</body>
+</html>

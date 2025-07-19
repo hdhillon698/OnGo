@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Stop Functionality Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+        }
+        
+        .test-header {
+            background: linear-gradient(135deg, #6C63FF, #4FD1C5);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .test-content {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .feature-demo {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .demo-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .demo-button:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+        
+        .feature-list {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .feature-list ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .code-block {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="test-header">
+        <h2 style="margin: 0; font-size: 1.8rem;"><i class="fas fa-route"></i> Multi-Stop Functionality Test</h2>
+        <p style="margin: 10px 0 0 0; opacity: 0.9;">Comprehensive testing of intermediate stops with address autofill and distance calculation</p>
+    </div>
+    
+    <div class="test-content">
+        <!-- Feature Overview -->
+        <div class="feature-demo">
+            <h3><i class="fas fa-star"></i> New Multi-Stop Features Implemented</h3>
+            <div class="feature-list">
+                <ul>
+                    <li><strong>Address Autocomplete:</strong> Full Nominatim API integration for all stops</li>
+                    <li><strong>Dynamic Stop Management:</strong> Add/remove stops with visual feedback</li>
+                    <li><strong>Distance Calculation:</strong> Accurate route calculation through all stops</li>
+                    <li><strong>Map Visualization:</strong> Interactive map showing complete route with stops</li>
+                    <li><strong>Price Calculation:</strong> Automatic pricing based on total route distance</li>
+                    <li><strong>Form Integration:</strong> Seamless integration with existing ride posting system</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Implementation Details -->
+        <div class="feature-demo">
+            <h3><i class="fas fa-code"></i> Technical Implementation</h3>
+            
+            <h4>1. Stop Management Functions</h4>
+            <div class="code-block">
+addStop() - Adds new intermediate stop to post ride form
+addFindStop() - Adds new intermediate stop to find rides form
+removeStop(id) - Removes specific stop and updates labels
+initializeStopAutocomplete(inputId, suggestionsId) - Sets up address autocomplete
+            </div>
+
+            <h4>2. Distance Calculation</h4>
+            <div class="code-block">
+updateRouteAndPrice() - Enhanced to calculate distance through all stops:
+• Start Point → Stop 1 → Stop 2 → ... → End Point
+• Uses Haversine formula + 25% road distance factor
+• Updates pricing automatically based on total distance
+            </div>
+
+            <h4>3. Map Integration</h4>
+            <div class="code-block">
+updateMapWithStops(allStops) - Updates Leaflet map to show:
+• Green marker: Start point
+• Blue markers: Intermediate stops
+• Red marker: End point
+• Polyline: Complete route through all stops
+            </div>
+        </div>
+
+        <!-- Usage Examples -->
+        <div class="feature-demo">
+            <h3><i class="fas fa-map-marked-alt"></i> Usage Examples</h3>
+            
+            <div class="highlight">
+                <h4>Example Route with Stops:</h4>
+                <p><strong>Start:</strong> Downtown Toronto</p>
+                <p><strong>Stop 1:</strong> Pearson Airport</p>
+                <p><strong>Stop 2:</strong> Mississauga Square One</p>
+                <p><strong>End:</strong> Burlington GO Station</p>
+                <p><strong>Total Distance:</strong> ~85 km (calculated through all stops)</p>
+                <p><strong>Pricing:</strong> Based on total distance with platform limits (0.15-0.25 $/km)</p>
+            </div>
+        </div>
+
+        <!-- Testing Instructions -->
+        <div class="feature-demo">
+            <h3><i class="fas fa-clipboard-check"></i> Testing Instructions</h3>
+            
+            <ol style="line-height: 1.8;">
+                <li><strong>Open Main Application:</strong> Load index.html in your browser</li>
+                <li><strong>Navigate to Post Ride:</strong> Click on the "Post" tab</li>
+                <li><strong>Add Stops:</strong> 
+                    <ul>
+                        <li>Fill in "From" address (e.g., "Toronto, ON")</li>
+                        <li>Click "Add Stop" button</li>
+                        <li>Enter intermediate stops (e.g., "Mississauga, ON", "Hamilton, ON")</li>
+                        <li>Fill in "To" address (e.g., "Burlington, ON")</li>
+                    </ul>
+                </li>
+                <li><strong>Observe Features:</strong>
+                    <ul>
+                        <li>Address autocomplete suggestions for each field</li>
+                        <li>Real-time distance calculation updates</li>
+                        <li>Map visualization showing complete route</li>
+                        <li>Automatic price suggestions based on total distance</li>
+                    </ul>
+                </li>
+                <li><strong>Test Find Rides:</strong> Same functionality available in "Find" tab</li>
+                <li><strong>Form Validation:</strong> Post ride to see complete route information</li>
+            </ol>
+        </div>
+
+        <!-- Button Actions -->
+        <div class="feature-demo" style="text-align: center;">
+            <h3><i class="fas fa-rocket"></i> Quick Actions</h3>
+            <button class="demo-button" onclick="window.open('index.html', '_blank')">
+                <i class="fas fa-external-link-alt"></i> Open Main Application
+            </button>
+            <button class="demo-button" onclick="showImplementationDetails()">
+                <i class="fas fa-info-circle"></i> Show Implementation Details
+            </button>
+        </div>
+
+        <!-- Results Display -->
+        <div id="implementation-details" style="display: none;" class="feature-demo">
+            <h3><i class="fas fa-cogs"></i> Implementation Details</h3>
+            <div class="code-block" id="implementation-content">
+                Loading implementation details...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showImplementationDetails() {
+            const detailsDiv = document.getElementById('implementation-details');
+            const contentDiv = document.getElementById('implementation-content');
+            
+            if (detailsDiv.style.display === 'none') {
+                detailsDiv.style.display = 'block';
+                contentDiv.innerHTML = `
+<strong>Key Variables:</strong>
+• postStops[] - Array tracking intermediate stops for post ride
+• findStops[] - Array tracking intermediate stops for find rides
+• stopCounter - Global counter for unique stop IDs
+
+<strong>Key Functions Added:</strong>
+• addStop() - Dynamically creates new stop input with autocomplete
+• removeStop(id) - Removes stop and updates numbering
+• updateRouteAndPrice() - Enhanced distance calculation through all stops
+• updateMapWithStops() - Leaflet map integration for route visualization
+• initializeStopAutocomplete() - Address autocomplete for stops
+
+<strong>CSS Classes Added:</strong>
+• .stop-group - Visual styling for stop containers
+• .btn-remove-stop - Remove button styling
+• .btn-outline - Dashed outline button style
+
+<strong>Distance Calculation Algorithm:</strong>
+1. Collect coordinates for: Start → Stop1 → Stop2 → ... → End
+2. Calculate distance between each consecutive pair
+3. Sum all segments for total route distance
+4. Apply 25% road distance factor
+5. Update pricing based on platform limits (0.15-0.25 $/km)
+
+<strong>Map Integration:</strong>
+• Green marker: Start point
+• Blue markers: Intermediate stops (numbered)
+• Red marker: End point
+• Blue polyline: Complete route path
+• Auto-fit bounds to show entire route
+                `;
+            } else {
+                detailsDiv.style.display = 'none';
+            }
+        }
+        
+        // Auto-scroll to top on load
+        window.scrollTo(0, 0);
+    </script>
+</body>
+</html>

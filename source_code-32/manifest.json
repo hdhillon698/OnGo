@@ -1,0 +1,63 @@
+{
+  "name": "OnGoPool - AI-Powered Carpool App",
+  "short_name": "OnGoPool",
+  "description": "Share rides with AI-powered matching, save money, and reduce your carbon footprint",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#6C63FF",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%236C63FF'/%3E%3Cpath d='M25 45h50l-5-10H30z' fill='white'/%3E%3Crect x='30' y='45' width='40' height='20' rx='5' fill='white'/%3E%3Ccircle cx='35' cy='70' r='8' fill='%23333'/%3E%3Ccircle cx='65' cy='70' r='8' fill='%23333'/%3E%3Ccircle cx='50' cy='25' r='3' fill='%234FD1C5'/%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%236C63FF'/%3E%3Cpath d='M25 45h50l-5-10H30z' fill='white'/%3E%3Crect x='30' y='45' width='40' height='20' rx='5' fill='white'/%3E%3Ccircle cx='35' cy='70' r='8' fill='%23333'/%3E%3Ccircle cx='65' cy='70' r='8' fill='%23333'/%3E%3Ccircle cx='50' cy='25' r='3' fill='%234FD1C5'/%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 428 926'%3E%3Crect width='428' height='926' fill='%23FFFFFF'/%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='0%25'%3E%3Cstop offset='0%25' style='stop-color:%236C63FF;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%234FD1C5;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='0' y='0' width='428' height='60' fill='url(%23grad)'/%3E%3Ctext x='214' y='35' text-anchor='middle' fill='white' font-size='18' font-family='Arial'%3EOnGoPool AI%3C/text%3E%3C/svg%3E",
+      "sizes": "428x926",
+      "type": "image/svg+xml",
+      "form_factor": "narrow"
+    }
+  ],
+  "categories": ["transportation", "travel", "social"],
+  "lang": "en",
+  "scope": "/",
+  "id": "ongopool-carpool-app",
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Find Rides",
+      "short_name": "Find",
+      "description": "Search for available rides",
+      "url": "/?tab=find-rides",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z' fill='%236C63FF'/%3E%3C/svg%3E",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Post Ride",
+      "short_name": "Post",
+      "description": "Offer a ride to others",
+      "url": "/?tab=post-ride",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z' fill='%236C63FF'/%3E%3C/svg%3E",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}

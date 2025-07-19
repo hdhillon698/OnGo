@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard Verification</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .status { padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .warning { background: #fff3cd; color: #856404; border-left: 4px solid #ffc107; }
+        .info { background: #cce7ff; color: #004085; border-left: 4px solid #007bff; }
+        button { background: #007bff; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; margin: 5px; font-size: 14px; }
+        button:hover { background: #0056b3; }
+        .test-step { margin: 15px 0; padding: 15px; border: 1px solid #dee2e6; border-radius: 4px; background: #f8f9fa; }
+        .step-title { font-weight: bold; margin-bottom: 10px; color: #495057; }
+        iframe { width: 100%; height: 500px; border: 1px solid #ddd; border-radius: 4px; margin: 10px 0; }
+        .console-output { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 10px; margin: 10px 0; max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✅ Admin Dashboard Verification Test</h1>
+        <p>This test verifies that the admin dashboard is working correctly after the fixes.</p>
+        
+        <div class="test-step">
+            <div class="step-title">Test Steps</div>
+            <button onclick="runTest()">🚀 Run Complete Test</button>
+            <button onclick="clearResults()">🗑️ Clear Results</button>
+            <div id="results"></div>
+        </div>
+        
+        <div class="console-output" id="console"></div>
+        <iframe id="app" src="about:blank"></iframe>
+    </div>
+
+    <script>
+        let appWindow = null;
+        
+        function log(message, type = 'info') {
+            const console = document.getElementById('console');
+            const timestamp = new Date().toLocaleTimeString();
+            console.textContent += `[${timestamp}] ${message}\n`;
+            console.scrollTop = console.scrollHeight;
+        }
+        
+        function showStatus(message, type = 'info') {
+            const results = document.getElementById('results');
+            results.innerHTML += `<div class="status ${type}">${message}</div>`;
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('console').textContent = '';
+        }
+        
+        async function runTest() {
+            clearResults();
+            log('Starting admin dashboard verification test...');
+            showStatus('🚀 Starting admin dashboard verification test...', 'info');
+            
+            try {
+                // Step 1: Load the app
+                log('Step 1: Loading application...');
+                await loadApp();
+                
+                // Step 2: Access admin login
+                log('Step 2: Accessing admin login...');
+                await accessAdminLogin();
+                
+                // Step 3: Submit credentials
+                log('Step 3: Submitting admin credentials...');
+                await submitAdminLogin();
+                
+                // Step 4: Verify dashboard loaded
+                log('Step 4: Verifying dashboard loaded...');
+                await verifyDashboard();
+                
+                // Step 5: Test license verification tab
+                log('Step 5: Testing license verification tab...');
+                await testLicenseTab();
+                
+                log('✅ All tests completed successfully!');
+                showStatus('✅ Admin dashboard is working correctly!', 'success');
+                
+            } catch (error) {
+                log('❌ Test failed: ' + error.message);
+                showStatus('❌ Test failed: ' + error.message, 'error');
+            }
+        }
+        
+        function loadApp() {
+            return new Promise((resolve, reject) => {
+                const iframe = document.getElementById('app');
+                iframe.src = './index.html';
+                
+                iframe.onload = () => {
+                    try {
+                        appWindow = iframe.contentWindow;
+                        log('✅ App loaded successfully');
+                        showStatus('✅ Application loaded', 'success');
+                        
+                        // Wait for initialization
+                        setTimeout(() => {
+                            resolve();
+                        }, 2000);
+                        
+                    } catch (error) {
+                        reject(new Error('Failed to access app window: ' + error.message));
+                    }
+                };
+                
+                iframe.onerror = () => {
+                    reject(new Error('Failed to load application'));
+                };
+            });
+        }
+        
+        function accessAdminLogin() {
+            return new Promise((resolve, reject) => {
+                try {
+                    if (!appWindow.showPage) {
+                        reject(new Error('showPage function not found'));
+                        return;
+                    }
+                    
+                    appWindow.showPage('admin-login-page');
+                    log('✅ Admin login page shown');
+                    showStatus('✅ Admin login page accessed', 'success');
+                    
+                    setTimeout(() => {
+                        const loginPage = appWindow.document.getElementById('admin-login-page');
+                        if (loginPage && loginPage.style.display !== 'none') {
+                            resolve();
+                        } else {
+                            reject(new Error('Admin login page not visible'));
+                        }
+                    }, 500);
+                    
+                } catch (error) {
+                    reject(new Error('Failed to access admin login: ' + error.message));
+                }
+            });
+        }
+        
+        function submitAdminLogin() {
+            return new Promise((resolve, reject) => {
+                try {
+                    const emailField = appWindow.document.getElementById('admin-email');
+                    const passwordField = appWindow.document.getElementById('admin-password');
+                    
+                    if (!emailField || !passwordField) {
+                        reject(new Error('Admin login form fields not found'));
+                        return;
+                    }
+                    
+                    emailField.value = 'admin@ongopool.com';
+                    passwordField.value = 'admin123';
+                    log('✅ Admin credentials entered');
+                    
+                    if (!appWindow.adminLogin) {
+                        reject(new Error('adminLogin function not found'));
+                        return;
+                    }
+                    
+                    const fakeEvent = { preventDefault: () => {} };
+                    appWindow.adminLogin(fakeEvent);
+                    log('✅ Admin login submitted');
+                    showStatus('✅ Admin credentials submitted', 'success');
+                    
+                    // Wait for login to process
+                    setTimeout(() => {
+                        resolve();
+                    }, 3000);
+                    
+                } catch (error) {
+                    reject(new Error('Failed to submit admin login: ' + error.message));
+                }
+            });
+        }
+        
+        function verifyDashboard() {
+            return new Promise((resolve, reject) => {
+                try {
+                    const dashboard = appWindow.document.getElementById('admin-dashboard');
+                    
+                    if (!dashboard) {
+                        reject(new Error('Admin dashboard element not found'));
+                        return;
+                    }
+                    
+                    const isVisible = dashboard.style.display !== 'none';
+                    const hasContent = dashboard.innerHTML.trim().length > 0;
+                    
+                    if (!isVisible) {
+                        reject(new Error('Admin dashboard is not visible'));
+                        return;
+                    }
+                    
+                    if (!hasContent) {
+                        reject(new Error('Admin dashboard is empty'));
+                        return;
+                    }
+                    
+                    log('✅ Dashboard is visible and has content');
+                    showStatus('✅ Admin dashboard loaded successfully', 'success');
+                    resolve();
+                    
+                } catch (error) {
+                    reject(new Error('Failed to verify dashboard: ' + error.message));
+                }
+            });
+        }
+        
+        function testLicenseTab() {
+            return new Promise((resolve, reject) => {
+                try {
+                    // Find the license verification tab
+                    const licenseTab = appWindow.document.querySelector('[data-tab="verification"]');
+                    
+                    if (!licenseTab) {
+                        reject(new Error('License verification tab not found'));
+                        return;
+                    }
+                    
+                    // Click the tab
+                    licenseTab.click();
+                    log('✅ License verification tab clicked');
+                    
+                    // Wait for content to load
+                    setTimeout(() => {
+                        const licenseGrid = appWindow.document.getElementById('license-grid');
+                        
+                        if (!licenseGrid) {
+                            reject(new Error('License grid not found'));
+                            return;
+                        }
+                        
+                        const hasContent = licenseGrid.innerHTML.trim().length > 0;
+                        
+                        if (!hasContent) {
+                            showStatus('⚠️ License tab loads but no data found (this is expected if no license verifications exist)', 'warning');
+                        } else {
+                            log('✅ License verification tab has content');
+                            showStatus('✅ License verification tab working correctly', 'success');
+                        }
+                        
+                        resolve();
+                        
+                    }, 3000);
+                    
+                } catch (error) {
+                    reject(new Error('Failed to test license tab: ' + error.message));
+                }
+            });
+        }
+    </script>
+</body>
+</html>

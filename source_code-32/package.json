@@ -1,0 +1,40 @@
+{
+  "name": "ongopool",
+  "version": "1.0.0",
+  "description": "AI-powered carpool application with intelligent ride matching",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "serve": "npx serve .",
+    "dev": "python -m http.server 8000",
+    "build": "echo 'Static site - no build required'",
+    "deploy:vercel": "vercel --prod",
+    "deploy:netlify": "netlify deploy --prod --dir .",
+    "test": "echo 'Open test.html in browser for manual testing'"
+  },
+  "keywords": [
+    "carpool",
+    "rideshare",
+    "ai",
+    "tensorflow",
+    "pwa",
+    "mobile-app",
+    "transportation",
+    "sharing-economy"
+  ],
+  "author": "OnGoPool Development Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hdhillon698/ongopool.git"
+  },
+  "homepage": "https://github.com/hdhillon698/ongopool#readme",
+  "bugs": {
+    "url": "https://github.com/hdhillon698/ongopool/issues"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "devDependencies": {},
+  "dependencies": {}
+}

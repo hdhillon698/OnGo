@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OnGoPool - Push Notifications Test</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+        }
+
+        .section-title {
+            margin-bottom: 1.5rem;
+        }
+
+        .test-users {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .user-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .driver-avatar {
+            background: #c53030;
+        }
+        
+        .passenger-avatar {
+            background: #6b46c1;
+        }
+
+        .user-role {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        .role-driver {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .role-passenger {
+            background: #d6bcfa;
+            color: #6b46c1;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin: 0.25rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        .btn-success { background: #48bb78; }
+        .btn-warning { background: #ed8936; }
+        .btn-danger { background: #f56565; }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .subscription-status {
+            background: #f1f5f9;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .notification-feed {
+            max-height: 200px;
+            overflow-y: auto;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-top: 1rem;
+            padding: 0.5rem;
+        }
+
+        .notification-item {
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+            background: white;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .notification-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .notification-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: white;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .notification-time {
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        .notification-body {
+            font-size: 0.9rem;
+        }
+
+        .cross-notifications {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .cross-notification-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .notification-type {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .notification-type h3 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .notification-preview {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            background: white;
+        }
+
+        .preview-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .preview-body {
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+
+        .notification-popup {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            max-width: 350px;
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification-popup.show {
+            transform: translateX(0);
+        }
+
+        .popup-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .popup-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+        }
+
+        .popup-title {
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .popup-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #718096;
+        }
+
+        .popup-body {
+            padding: 0.5rem 0;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .popup-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .popup-btn {
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border: none;
+            background: #f7fafc;
+            color: #4a5568;
+            transition: all 0.2s ease;
+        }
+
+        .popup-btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .console {
+            background: #1a202c;
+            color: #e2e8f0;
+            border-radius: 10px;
+            padding: 1rem;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.85rem;
+            height: 200px;
+            overflow-y: auto;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-bell"></i> Push Notifications Test</h1>
+            <p>Test real-time push notifications between users</p>
+        </div>
+
+        <div class="section-title">
+            <h2>User Notification Settings</h2>
+            <p>Manage notification permissions and subscriptions</p>
+        </div>
+
+        <div class="test-users">
+            <div class="user-card">
+                <div class="user-header">
+                    <div class="user-avatar driver-avatar">D</div>
+                    <div>
+                        <h3>Daniel Driver</h3>
+                        <p>Driver User</p>
+                    </div>
+                    <span class="user-role role-driver">Driver</span>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn" id="driver-request-permission">Request Permission</button>
+                    <button class="btn btn-success" id="driver-subscribe">Subscribe to Push</button>
+                    <button class="btn btn-warning" id="driver-test">Test Notification</button>
+                </div>
+                <div class="subscription-status" id="driver-status">
+                    <strong>Notification Permission:</strong> <span id="driver-permission-status">Not requested</span><br>
+                    <strong>Push Subscription:</strong> <span id="driver-subscription-status">Not subscribed</span>
+                </div>
+
+                <h4 style="margin-top: 1.5rem;">Recent Notifications</h4>
+                <div class="notification-feed" id="driver-notifications">
+                    <!-- Notifications will appear here -->
+                </div>
+            </div>
+
+            <div class="user-card">
+                <div class="user-header">
+                    <div class="user-avatar passenger-avatar">P</div>
+                    <div>
+                        <h3>Patty Passenger</h3>
+                        <p>Passenger User</p>
+                    </div>
+                    <span class="user-role role-passenger">Passenger</span>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn" id="passenger-request-permission">Request Permission</button>
+                    <button class="btn btn-success" id="passenger-subscribe">Subscribe to Push</button>
+                    <button class="btn btn-warning" id="passenger-test">Test Notification</button>
+                </div>
+                <div class="subscription-status" id="passenger-status">
+                    <strong>Notification Permission:</strong> <span id="passenger-permission-status">Not requested</span><br>
+                    <strong>Push Subscription:</strong> <span id="passenger-subscription-status">Not subscribed</span>
+                </div>
+
+                <h4 style="margin-top: 1.5rem;">Recent Notifications</h4>
+                <div class="notification-feed" id="passenger-notifications">
+                    <!-- Notifications will appear here -->
+                </div>
+            </div>
+        </div>
+
+        <div class="cross-notifications">
+            <h2><i class="fas fa-exchange-alt"></i> Cross-User Notifications</h2>
+            <p>Send notifications from one user to another</p>
+
+            <div class="cross-notification-grid">
+                <div class="notification-type">
+                    <h3><i class="fas fa-car"></i> Driver to Passenger</h3>
+                    
+                    <div class="notification-preview">
+                        <div class="preview-header">
+                            <div class="notification-icon driver-avatar">D</div>
+                            <div class="preview-title">Arrival Notice</div>
+                        </div>
+                        <div class="preview-body">
+                            I've arrived at the pickup location!
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn" id="driver-to-passenger-arrival">Send Arrival Notice</button>
+                        <button class="btn" id="driver-to-passenger-delay">Send Delay Notice</button>
+                        <button class="btn" id="driver-to-passenger-complete">Send Ride Complete</button>
+                    </div>
+                </div>
+
+                <div class="notification-type">
+                    <h3><i class="fas fa-user"></i> Passenger to Driver</h3>
+                    
+                    <div class="notification-preview">
+                        <div class="preview-header">
+                            <div class="notification-icon passenger-avatar">P</div>
+                            <div class="preview-title">Ready for Pickup</div>
+                        </div>
+                        <div class="preview-body">
+                            I'm ready for pickup now
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn" id="passenger-to-driver-ready">Send Ready Notice</button>
+                        <button class="btn" id="passenger-to-driver-delay">Send Delay Notice</button>
+                        <button class="btn" id="passenger-to-driver-change">Send Change Request</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="cross-notifications">
+            <h2><i class="fas fa-history"></i> Automated Notifications</h2>
+            <p>System-generated notifications for ride events</p>
+
+            <div class="cross-notification-grid">
+                <div class="notification-type">
+                    <h3><i class="fas fa-calendar-check"></i> Ride Reminders</h3>
+                    
+                    <div class="notification-preview">
+                        <div class="preview-header">
+                            <div class="notification-icon" style="background: #4299e1;">
+                                <i class="fas fa-calendar-alt" style="color: white;"></i>
+                            </div>
+                            <div class="preview-title">Ride Reminder</div>
+                        </div>
+                        <div class="preview-body">
+                            Your ride to Downtown departs in 30 minutes!
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn" id="system-ride-reminder">Send Ride Reminder</button>
+                        <button class="btn" id="system-booking-confirmation">Send Booking Confirmation</button>
+                    </div>
+                </div>
+
+                <div class="notification-type">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Alert Notifications</h3>
+                    
+                    <div class="notification-preview">
+                        <div class="preview-header">
+                            <div class="notification-icon" style="background: #ed8936;">
+                                <i class="fas fa-exclamation-triangle" style="color: white;"></i>
+                            </div>
+                            <div class="preview-title">Ride Canceled</div>
+                        </div>
+                        <div class="preview-body">
+                            Your upcoming ride has been canceled by the driver.
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn" id="system-ride-canceled">Send Cancellation Notice</button>
+                        <button class="btn" id="system-payment-failed">Send Payment Failed</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="notification-popup" id="notification-popup">
+            <div class="popup-header">
+                <div class="popup-icon" id="popup-icon">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="popup-title" id="popup-title">New Notification</div>
+                <button class="popup-close" onclick="closePopup()">&times;</button>
+            </div>
+            <div class="popup-body" id="popup-body">
+                Notification content
+            </div>
+            <div class="popup-actions">
+                <button class="popup-btn" onclick="closePopup()">Dismiss</button>
+                <button class="popup-btn popup-btn-primary" onclick="closePopup()">View</button>
+            </div>
+        </div>
+
+        <div class="console" id="console">
+            <!-- Console logs will appear here -->
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Global variables
+        let supabase;
+        
+        // Mock user IDs
+        const userIds = {
+            driver: '00000000-0000-0000-0000-000000000001',
+            passenger: '00000000-0000-0000-0000-000000000002'
+        };
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSupabase();
+            setupEventListeners();
+            checkNotificationSupport();
+            logToConsole('🚀 Push notifications test initialized');
+        });
+        
+        // Initialize Supabase
+        function initializeSupabase() {
+            try {
+                const SUPABASE_URL = 'https://efjwsdxgelbgthcyltjr.supabase.co';
+                const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmandzZHhnZWxiZ3RoY3lsdGpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3OTUwODksImV4cCI6MjA2NjM3MTA4OX0.giqea72-32b0_AhVXyCxQ_6xpjDrd7Z33HcibB8xtNs';
+                
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                
+                logToConsole('✅ Supabase connection established');
+            } catch (error) {
+                logToConsole('❌ Failed to connect to Supabase: ' + error.message, 'error');
+            }
+        }
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            // Driver permission and subscription
+            document.getElementById('driver-request-permission').addEventListener('click', () => requestNotificationPermission('driver'));
+            document.getElementById('driver-subscribe').addEventListener('click', () => subscribeToPush('driver'));
+            document.getElementById('driver-test').addEventListener('click', () => testNotification('driver'));
+            
+            // Passenger permission and subscription
+            document.getElementById('passenger-request-permission').addEventListener('click', () => requestNotificationPermission('passenger'));
+            document.getElementById('passenger-subscribe').addEventListener('click', () => subscribeToPush('passenger'));
+            document.getElementById('passenger-test').addEventListener('click', () => testNotification('passenger'));
+            
+            // Driver to passenger notifications
+            document.getElementById('driver-to-passenger-arrival').addEventListener('click', () => 
+                sendCrossUserNotification('driver', 'passenger', 'Arrival Notice', "I've arrived at the pickup location!"));
+            document.getElementById('driver-to-passenger-delay').addEventListener('click', () => 
+                sendCrossUserNotification('driver', 'passenger', 'Delay Notice', "I'll be 5 minutes late due to traffic"));
+            document.getElementById('driver-to-passenger-complete').addEventListener('click', () => 
+                sendCrossUserNotification('driver', 'passenger', 'Ride Complete', "Ride completed. Thanks for riding with me!"));
+            
+            // Passenger to driver notifications
+            document.getElementById('passenger-to-driver-ready').addEventListener('click', () => 
+                sendCrossUserNotification('passenger', 'driver', 'Ready for Pickup', "I'm ready for pickup now"));
+            document.getElementById('passenger-to-driver-delay').addEventListener('click', () => 
+                sendCrossUserNotification('passenger', 'driver', 'Delay Notice', "I'll be 2 minutes late to the pickup spot"));
+            document.getElementById('passenger-to-driver-change').addEventListener('click', () => 
+                sendCrossUserNotification('passenger', 'driver', 'Change Request', "Can you drop me at a different location?"));
+                
+            // System notifications
+            document.getElementById('system-ride-reminder').addEventListener('click', () => 
+                sendSystemNotification('both', 'Ride Reminder', "Your ride to Downtown departs in 30 minutes!", 'calendar-alt', '#4299e1'));
+            document.getElementById('system-booking-confirmation').addEventListener('click', () => 
+                sendSystemNotification('both', 'Booking Confirmed', "Your ride booking has been confirmed!", 'check-circle', '#48bb78'));
+            document.getElementById('system-ride-canceled').addEventListener('click', () => 
+                sendSystemNotification('both', 'Ride Canceled', "Your upcoming ride has been canceled by the driver.", 'times-circle', '#e53e3e'));
+            document.getElementById('system-payment-failed').addEventListener('click', () => 
+                sendSystemNotification('both', 'Payment Failed', "Your payment for the recent ride could not be processed.", 'credit-card', '#e53e3e'));
+        }
+        
+        // Check notification support
+        function checkNotificationSupport() {
+            if (!('Notification' in window)) {
+                logToConsole('❌ This browser does not support push notifications', 'error');
+                document.getElementById('driver-permission-status').textContent = 'Not supported';
+                document.getElementById('passenger-permission-status').textContent = 'Not supported';
+                return false;
+            }
+            
+            logToConsole('✅ Browser supports push notifications');
+            
+            // Check if service worker is supported
+            if ('serviceWorker' in navigator) {
+                logToConsole('✅ Browser supports service workers');
+            } else {
+                logToConsole('❌ This browser does not support service workers', 'warning');
+            }
+            
+            // Check current permission status
+            updatePermissionStatus('driver', Notification.permission);
+            updatePermissionStatus('passenger', Notification.permission);
+            
+            return true;
+        }
+        
+        // Request notification permission
+        function requestNotificationPermission(userType) {
+            if (!('Notification' in window)) {
+                logToConsole('❌ This browser does not support push notifications', 'error');
+                return;
+            }
+            
+            Notification.requestPermission().then(permission => {
+                updatePermissionStatus(userType, permission);
+                
+                if (permission === 'granted') {
+                    logToConsole(`✅ ${userType} granted notification permission`, 'success');
+                    
+                    // If permission is granted, attempt to register service worker
+                    if ('serviceWorker' in navigator) {
+                        registerServiceWorker(userType);
+                    }
+                } else if (permission === 'denied') {
+                    logToConsole(`❌ ${userType} denied notification permission`, 'error');
+                } else {
+                    logToConsole(`⚠️ ${userType} dismissed notification permission prompt`, 'warning');
+                }
+            });
+        }
+        
+        // Update permission status display
+        function updatePermissionStatus(userType, permission) {
+            const statusElement = document.getElementById(`${userType}-permission-status`);
+            
+            switch (permission) {
+                case 'granted':
+                    statusElement.textContent = 'Granted';
+                    statusElement.style.color = '#48bb78';
+                    break;
+                case 'denied':
+                    statusElement.textContent = 'Blocked';
+                    statusElement.style.color = '#e53e3e';
+                    break;
+                default:
+                    statusElement.textContent = 'Not requested';
+                    statusElement.style.color = '#718096';
+            }
+        }
+        
+        // Register service worker
+        function registerServiceWorker(userType) {
+            if (!('serviceWorker' in navigator)) {
+                logToConsole('❌ Service workers not supported', 'error');
+                return;
+            }
+            
+            navigator.serviceWorker.register('/sw.js')
+                .then(registration => {
+                    logToConsole(`✅ Service worker registered for ${userType}`, 'success');
+                })
+                .catch(error => {
+                    logToConsole(`❌ Service worker registration failed: ${error.message}`, 'error');
+                });
+        }
+        
+        // Subscribe to push notifications
+        async function subscribeToPush(userType) {
+            if (Notification.permission !== 'granted') {
+                logToConsole(`❌ ${userType} needs to grant notification permission first`, 'error');
+                return;
+            }
+            
+            if (!supabase) {
+                logToConsole('❌ Supabase not connected', 'error');
+                return;
+            }
+            
+            // In a real implementation, we would use the Push API and PushManager
+            // to get a real subscription object with endpoint and keys
+            
+            // For this demo, we'll create a mock subscription
+            try {
+                logToConsole(`🔔 Subscribing ${userType} to push notifications...`);
+                
+                const subscriptionData = {
+                    user_id: userIds[userType],
+                    endpoint: `https://fcm.googleapis.com/fcm/send/mock_${userType}_${Date.now()}`,
+                    p256dh: 'BNcRdreALRFXTkOOUHK1EtK2wtaz5Ry4YfYCA_0QTpQtfZOc6rrVHS-6hpgDjyRCh7B3oxuzpQsDHDD5P7raqaE',
+                    auth: 'Q2BoAjC09xam_Nv1xKTNfA',
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                };
+                
+                const { data, error } = await supabase
+                    .from('notification_subscriptions')
+                    .insert([subscriptionData]);
+                
+                if (error) {
+                    logToConsole(`❌ Error saving subscription: ${error.message}`, 'error');
+                } else {
+                    logToConsole(`✅ ${userType} subscribed to push notifications`, 'success');
+                    
+                    // Update subscription status
+                    const statusElement = document.getElementById(`${userType}-subscription-status`);
+                    statusElement.textContent = 'Subscribed';
+                    statusElement.style.color = '#48bb78';
+                }
+            } catch (error) {
+                logToConsole(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Test notification
+        function testNotification(userType) {
+            if (Notification.permission !== 'granted') {
+                logToConsole(`❌ ${userType} needs to grant notification permission first`, 'error');
+                return;
+            }
+            
+            const title = `Test Notification for ${userType === 'driver' ? 'Daniel' : 'Patty'}`;
+            const options = {
+                body: `This is a test notification for ${userType} user`,
+                icon: '/favicon.ico',
+                badge: '/favicon.ico',
+                tag: `test-${userType}`,
+                renotify: true
+            };
+            
+            // Create browser notification
+            const notification = new Notification(title, options);
+            
+            // Log notification
+            logToConsole(`🔔 Test notification sent to ${userType}`, 'success');
+            
+            // Add to notification feed
+            addNotificationToFeed(userType, {
+                title: title,
+                body: options.body,
+                icon: userType === 'driver' ? 'car' : 'user',
+                color: userType === 'driver' ? '#c53030' : '#6b46c1',
+                timestamp: new Date()
+            });
+            
+            // Show popup
+            showPopupNotification(userType, title, options.body);
+        }
+        
+        // Send cross-user notification
+        async function sendCrossUserNotification(fromUser, toUser, title, message) {
+            logToConsole(`📤 ${fromUser} sending notification to ${toUser}: ${message}`);
+            
+            // Add to notification feed of the recipient
+            addNotificationToFeed(toUser, {
+                title: title,
+                body: message,
+                icon: fromUser === 'driver' ? 'car' : 'user',
+                color: fromUser === 'driver' ? '#c53030' : '#6b46c1',
+                timestamp: new Date()
+            });
+            
+            // Show popup notification for recipient
+            showPopupNotification(fromUser, title, message);
+            
+            // In a real implementation, we would save to database and trigger a push notification
+            if (supabase) {
+                try {
+                    const notificationData = {
+                        user_id: userIds[toUser],
+                        title: title,
+                        message: message,
+                        sender_id: userIds[fromUser],
+                        type: 'user_message',
+                        is_read: false,
+                        created_at: new Date().toISOString()
+                    };
+                    
+                    const { data, error } = await supabase
+                        .from('notifications')
+                        .insert([notificationData]);
+                    
+                    if (error) {
+                        logToConsole(`❌ Error saving notification: ${error.message}`, 'error');
+                    } else {
+                        logToConsole(`✅ Notification saved to database`, 'success');
+                    }
+                } catch (error) {
+                    logToConsole(`❌ Error: ${error.message}`, 'error');
+                }
+            }
+        }
+        
+        // Send system notification
+        async function sendSystemNotification(targetUsers, title, message, icon = 'bell', color = '#4299e1') {
+            logToConsole(`🔔 System sending notification: ${title}`);
+            
+            if (targetUsers === 'both' || targetUsers === 'driver') {
+                addNotificationToFeed('driver', {
+                    title: title,
+                    body: message,
+                    icon: icon,
+                    color: color,
+                    timestamp: new Date(),
+                    isSystem: true
+                });
+            }
+            
+            if (targetUsers === 'both' || targetUsers === 'passenger') {
+                addNotificationToFeed('passenger', {
+                    title: title,
+                    body: message,
+                    icon: icon,
+                    color: color,
+                    timestamp: new Date(),
+                    isSystem: true
+                });
+            }
+            
+            // Show popup notification
+            showPopupNotification('system', title, message, icon, color);
+            
+            // In a real implementation, we would save to database and trigger push notifications
+            if (supabase) {
+                try {
+                    const users = targetUsers === 'both' ? [userIds.driver, userIds.passenger] : [userIds[targetUsers]];
+                    
+                    for (const userId of users) {
+                        const notificationData = {
+                            user_id: userId,
+                            title: title,
+                            message: message,
+                            sender_id: null, // System notification
+                            type: 'system',
+                            is_read: false,
+                            created_at: new Date().toISOString()
+                        };
+                        
+                        const { data, error } = await supabase
+                            .from('notifications')
+                            .insert([notificationData]);
+                        
+                        if (error) {
+                            logToConsole(`❌ Error saving notification: ${error.message}`, 'error');
+                        }
+                    }
+                    
+                    logToConsole(`✅ System notifications saved to database`, 'success');
+                } catch (error) {
+                    logToConsole(`❌ Error: ${error.message}`, 'error');
+                }
+            }
+        }
+        
+        // Add notification to feed
+        function addNotificationToFeed(userType, notification) {
+            const feedElement = document.getElementById(`${userType}-notifications`);
+            
+            const notificationItem = document.createElement('div');
+            notificationItem.className = 'notification-item';
+            
+            const notificationHeader = document.createElement('div');
+            notificationHeader.className = 'notification-header';
+            
+            const iconElement = document.createElement('div');
+            iconElement.className = 'notification-icon';
+            iconElement.style.background = notification.color;
+            iconElement.innerHTML = `<i class="fas fa-${notification.icon}" style="color: white;"></i>`;
+            
+            const titleElement = document.createElement('div');
+            titleElement.className = 'notification-title';
+            titleElement.textContent = notification.title;
+            
+            const timeElement = document.createElement('div');
+            timeElement.className = 'notification-time';
+            timeElement.textContent = notification.timestamp.toLocaleTimeString();
+            
+            notificationHeader.appendChild(iconElement);
+            notificationHeader.appendChild(titleElement);
+            notificationHeader.appendChild(timeElement);
+            
+            const bodyElement = document.createElement('div');
+            bodyElement.className = 'notification-body';
+            bodyElement.textContent = notification.body;
+            
+            notificationItem.appendChild(notificationHeader);
+            notificationItem.appendChild(bodyElement);
+            
+            // Add to the top of the feed
+            if (feedElement.firstChild) {
+                feedElement.insertBefore(notificationItem, feedElement.firstChild);
+            } else {
+                feedElement.appendChild(notificationItem);
+            }
+        }
+        
+        // Show popup notification
+        function showPopupNotification(fromType, title, message, icon = null, color = null) {
+            const popupElement = document.getElementById('notification-popup');
+            const iconElement = document.getElementById('popup-icon');
+            const titleElement = document.getElementById('popup-title');
+            const bodyElement = document.getElementById('popup-body');
+            
+            // Set icon and color based on type
+            if (!icon) {
+                icon = fromType === 'driver' ? 'car' : (fromType === 'passenger' ? 'user' : 'bell');
+            }
+            
+            if (!color) {
+                color = fromType === 'driver' ? '#c53030' : (fromType === 'passenger' ? '#6b46c1' : '#4299e1');
+            }
+            
+            iconElement.style.background = color;
+            iconElement.innerHTML = `<i class="fas fa-${icon}" style="color: white;"></i>`;
+            
+            titleElement.textContent = title;
+            bodyElement.textContent = message;
+            
+            // Show popup
+            popupElement.classList.add('show');
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                closePopup();
+            }, 5000);
+        }
+        
+        // Close notification popup
+        function closePopup() {
+            const popupElement = document.getElementById('notification-popup');
+            popupElement.classList.remove('show');
+        }
+        
+        // Console logging
+        function logToConsole(message, type = 'info') {
+            const console = document.getElementById('console');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            
+            let color = '#e2e8f0';
+            if (type === 'success') color = '#48bb78';
+            if (type === 'error') color = '#f56565';
+            if (type === 'warning') color = '#ed8936';
+            
+            logEntry.style.color = color;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            console.appendChild(logEntry);
+            console.scrollTop = console.scrollHeight;
+        }
+    </script>
+</body>
+</html>
